@@ -35,6 +35,9 @@ void Ball::collision(WallSide side)
     {
     case Left:
         velocity.xVel *= -1;
+
+        // TESTING
+        velocity.xVel += 3;
         break;
 
     case Top:
@@ -51,15 +54,8 @@ void Ball::collision(WallSide side)
     }
 }
 
-void Ball::ballCollision(Ball *otherBall)
-{
-    velocity.xVel = 0;
-    velocity.yVel = 0;
-}
-
 void Ball::updateColor()
 {
-
     float vel = max(abs(velocity.xVel), abs(velocity.yVel));
     float percentMax = vel / ((abs(maxVelocity.xVel) + abs(maxVelocity.yVel)) / 2);
 

@@ -15,8 +15,12 @@ int main()
 
     while (!WindowShouldClose())
     {
-        graphics.printState(state);
-        ballManager.updateBalls();
+        // TEMP to slow down game
+        if (rand() % 10 == 0)
+        {
+            graphics.printState(state);
+            ballManager.updateBalls();
+        }
     }
 
     CloseWindow();

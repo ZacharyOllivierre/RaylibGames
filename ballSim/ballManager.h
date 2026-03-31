@@ -30,7 +30,6 @@ public:
 
     void updateBalls();
     void checkWallCollisions(Ball *ball);
-    void checkBallCollisions(Ball *ball);
 
     inline vector<Rectangle> getWalls() { return walls; };
 };

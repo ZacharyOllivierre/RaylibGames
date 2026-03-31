@@ -35,5 +35,4 @@ public:
     void update();
 
     void collision(WallSide side);
-    void ballCollision(Ball *otherBall);
 };

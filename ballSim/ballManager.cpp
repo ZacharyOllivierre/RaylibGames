@@ -10,7 +10,9 @@ BallManager::BallManager(Rectangle ballRec)
 
     srand(time(nullptr));
 
-    maxVelocity = {ballRec.width / 7, ballRec.height / 7};
+    // 7 is about ideal
+    int screenSizeDivisior = 10;
+    maxVelocity = {ballRec.width / screenSizeDivisior, ballRec.height / screenSizeDivisior};
 
     // Testing add default balls
     int numBalls = 4;
@@ -30,8 +32,7 @@ BallManager::~BallManager()
 
 void BallManager::addBallCenter()
 {
-    Velocity maxStartVel = {30, 30};
-    Velocity startingVelocity = getRandomVelocity(maxStartVel);
+    Velocity startingVelocity = getRandomVelocity(maxVelocity);
     Point centerPoint = getCenter(ballRec);
 
     Ball *newBall = new Ball(
@@ -49,9 +50,6 @@ void BallManager::updateBalls()
         ball->update();
 
         checkWallCollisions(ball);
-
-        // not working
-        checkBallCollisions(ball);
     }
 }
 
@@ -87,24 +85,6 @@ void BallManager::checkWallCollisions(Ball *ball)
     {
         ball->collision(Bottom);
         ball->point.y = wallBottom - ball->radius;
-    }
-}
-
-void BallManager::checkBallCollisions(Ball *ball)
-{
-    for (Ball *b : balls)
-    {
-        if (b != ball)
-        {
-            // Not working
-            bool collision = CheckCollisionCircles({ball->point.x, ball->point.y}, ball->radius, {b->point.x, b->point.y}, b->radius);
-            std::cout << "Collision result " << collision << std::endl;
-            if (collision)
-            {
-                // ball->ballCollision(b);
-                std::cout << "Ball collision" << std::endl;
-            }
-        }
     }
 }
 
