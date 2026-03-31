@@ -1,0 +1,15 @@
+/build/
+/bin/
+raylib/
+
+lib/
+*.a
+*.o
+*.obj
+*.exe
+*.out
+
+.vscode/
+
+.DS_Store
+
