@@ -10,10 +10,11 @@ Each project is self contained and explores different mechanics, rendering techn
   - Inspired by Slackermanz implementation
 
 ### Pong
-  - Its pong!
+  - Its Pong!
   - But with shaders
 
 ### Tetris (Work in progress)
+  - Its Tetris!
 
 ## Building
   - Pray

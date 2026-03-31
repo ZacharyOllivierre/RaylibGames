@@ -1,10 +1,11 @@
-#include <raylib.h>
+#include "raylib.h"
 #include <cstdlib>
 #include <ctime>
 #include "game.h"
 #include "graphics.h"
 
-enum GameState {
+enum GameState
+{
 
 	STARTMENU,
 	PLAYING,
@@ -12,10 +13,11 @@ enum GameState {
 	GAMEOVER
 };
 
-void checkWon(Game& game, GameState& state);
+void checkWon(Game &game, GameState &state);
 
-int main() {
-	
+int main()
+{
+
 	// Basics
 	const int fps = 60;
 	int screenWidth = GetMonitorWidth(0);
@@ -23,16 +25,16 @@ int main() {
 
 	const int gameWidth = 1400;
 	const int gameHeight = 750;
-	
+
 	// Game values
 	int pointsToWin = 7;
 	int ballSize = 9;
 	int paddleHeight = gameHeight * .15;
 	int paddleWidth = 5;
-	
+
 	// Initiallize window / audio
 	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
-	
+
 	InitWindow(screenWidth, screenHeight, "PONG");
 	ToggleFullscreen();
 
@@ -47,48 +49,53 @@ int main() {
 
 	GameState state = STARTMENU;
 	Game game(gameWidth, gameHeight, pointsToWin, ballSize, paddleWidth, paddleHeight);
-	
+
 	// Graphics
 	Graphics gameGraphics(screenWidth, screenHeight, gameWidth, gameHeight);
 
 	// Music
-	Sounds sound;	
+	Sounds sound;
 	PlayMusicStream(sound.getMusic());
-	
+
 	// Game loop
-	while (!WindowShouldClose()) {
-		
+	while (!WindowShouldClose())
+	{
+
 		// Update Music
 		UpdateMusicStream(sound.getMusic());
-		
+
 		// Start drawing
 		BeginDrawing();
 		ClearBackground(BLACK);
 
 		// Switch for each GameState
-		switch (state) {
+		switch (state)
+		{
 
-		case GameState::STARTMENU: {
-			
+		case GameState::STARTMENU:
+		{
+
 			gameGraphics.drawGame(state, game);
-	
+
 			// Get start input
-			if (IsKeyPressed(KEY_SPACE)) {
-				
+			if (IsKeyPressed(KEY_SPACE))
+			{
+
 				sound.playMenuClick();
 				state = GameState::PLAYING;
-			}	
+			}
 			break;
 		}
-		case GameState::PLAYING: {
-	
+		case GameState::PLAYING:
+		{
+
 			// Get input
 			game.updatePlayerPaddle();
 			game.updateBotPaddle();
-			
-			// Update state			
-			game.updateBallState();	
-	
+
+			// Update state
+			game.updateBallState();
+
 			// Drawing
 			gameGraphics.drawGame(state, game);
 
@@ -97,25 +104,29 @@ int main() {
 
 			break;
 		}
-		case GameState::GAMEOVER: {
-			
+		case GameState::GAMEOVER:
+		{
+
 			gameGraphics.drawGame(state, game);
 
 			// Get continue input
-			if (IsKeyPressed(KEY_SPACE)) {
+			if (IsKeyPressed(KEY_SPACE))
+			{
 
 				sound.playMenuClick();
 				state = GameState::PLAYING;
 			}
 			break;
 		}
-		case GameState::PLAYERWON: {
-					
+		case GameState::PLAYERWON:
+		{
+
 			gameGraphics.drawGame(state, game);
 
 			// Get continue input
-			if (IsKeyPressed(KEY_SPACE)) {
-	
+			if (IsKeyPressed(KEY_SPACE))
+			{
+
 				sound.playMenuClick();
 				state = GameState::PLAYING;
 			}
@@ -126,7 +137,6 @@ int main() {
 		// End drawing
 		EndDrawing();
 	}
-	
 
 	// Close
 	CloseAudioDevice();
@@ -135,18 +145,20 @@ int main() {
 	return 0;
 }
 
-void checkWon(Game& game, GameState& state) {
+void checkWon(Game &game, GameState &state)
+{
 
 	int won = game.hasWon();
-	
+
 	// Player won
-	if (won == 1) {
+	if (won == 1)
+	{
 		game.resetGame();
 		state = GameState::PLAYERWON;
 	}
-	else if (won == 2) {
+	else if (won == 2)
+	{
 		game.resetGame();
 		state = GameState::GAMEOVER;
 	}
-
 }
