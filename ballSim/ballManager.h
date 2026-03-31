@@ -17,19 +17,16 @@ private:
 
     Velocity maxVelocity;
 
-    void setWalls(float wallWidth);
     Velocity getRandomVelocity(Velocity max);
 
 public:
     vector<Ball *> balls;
 
-    BallManager(Rectangle ballRec);
+    BallManager(Rectangle ballRec, const vector<Rectangle> &walls);
     ~BallManager();
 
     void addBallCenter();
 
     void updateBalls();
     void checkWallCollisions(Ball *ball);
-
-    inline vector<Rectangle> getWalls() { return walls; };
 };

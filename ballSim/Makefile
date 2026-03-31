@@ -1,4 +1,4 @@
-SOURCES = main.cpp ball.cpp ballManager.cpp graphics.cpp basicFunctions.cpp
+SOURCES = main.cpp ball.cpp ballManager.cpp graphics.cpp basicFunctions.cpp control.cpp buildRecs.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXEC    = b.exe
 

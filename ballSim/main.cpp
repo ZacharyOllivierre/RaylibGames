@@ -1,24 +1,35 @@
 #include "raylib.h"
 #include "ballManager.h"
 #include "graphics.h"
+#include "control.h"
+#include "buildRecs.h"
 
 int main()
 {
-    InitWindow(1000, 800, "ball sim");
+    const int screenWidth = 1200;
+    const int screenHeight = 800;
+
+    InitWindow(screenWidth, screenHeight, "ball sim");
     SetTargetFPS(60);
 
-    Graphics graphics;
-    BallManager ballManager(graphics.getData().simRec);
-
-    graphics.getBallManagerPtr(&ballManager);
     State state = State::Game;
+    GraphicsData data;
+    BuildRecs recs(static_cast<float>(screenWidth), static_cast<float>(screenHeight));
+
+    data = recs.buildGraphicsData();
+
+    BallManager ballManager(data.gameStateRecs[GraphicsData::SimRec], data.wallRecs);
+    Graphics graphics(data, &ballManager);
+
+    // Control control(&state);
 
     while (!WindowShouldClose())
     {
-        // TEMP to slow down game
-        if (rand() % 10 == 0)
+        graphics.printState(state);
+        // control.controlsForState(state);
+
+        if (state == State::Game)
         {
-            graphics.printState(state);
             ballManager.updateBalls();
         }
     }

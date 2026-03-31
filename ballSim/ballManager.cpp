@@ -1,12 +1,10 @@
 #include "ballManager.h"
 #include <iostream>
 
-BallManager::BallManager(Rectangle ballRec)
+BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls)
 {
     this->ballRec = ballRec;
-
-    int wallWidth = 10;
-    setWalls(wallWidth);
+    this->walls = walls;
 
     srand(time(nullptr));
 
@@ -55,6 +53,11 @@ void BallManager::updateBalls()
 
 void BallManager::checkWallCollisions(Ball *ball)
 {
+    if (walls.size() < 4)
+    {
+        return;
+    }
+
     int ballLeft = ball->point.x - ball->radius;
     int ballRight = ball->point.x + ball->radius;
     int ballTop = ball->point.y - ball->radius;
@@ -86,38 +89,6 @@ void BallManager::checkWallCollisions(Ball *ball)
         ball->collision(Bottom);
         ball->point.y = wallBottom - ball->radius;
     }
-}
-
-void BallManager::setWalls(float wallWidth)
-{
-    Rectangle leftWall = {
-        ballRec.x,
-        ballRec.y,
-        wallWidth,
-        ballRec.height};
-
-    Rectangle topWall = {
-        ballRec.x,
-        ballRec.y,
-        ballRec.width,
-        wallWidth};
-
-    Rectangle rightWall = {
-        ballRec.x + ballRec.width - wallWidth,
-        ballRec.y,
-        wallWidth,
-        ballRec.height};
-
-    Rectangle bottomWall = {
-        ballRec.x,
-        ballRec.y + ballRec.height - wallWidth,
-        ballRec.width,
-        wallWidth};
-
-    walls.push_back(leftWall);
-    walls.push_back(topWall);
-    walls.push_back(rightWall);
-    walls.push_back(bottomWall);
 }
 
 Velocity BallManager::getRandomVelocity(Velocity max)

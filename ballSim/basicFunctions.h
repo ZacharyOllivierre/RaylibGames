@@ -1,8 +1,12 @@
 #pragma once
 
 #include "raylib.h"
-#include <iostream> // for debugging
-using namespace std;
+#include <vector>
+#include <iostream>
+
+using std::cout;
+using std::endl;
+using std::vector;
 
 struct Point
 {
@@ -13,6 +17,40 @@ struct Point
 struct RGB
 {
     unsigned char r, g, b, a;
+};
+
+enum class State
+{
+    Main,
+    Game,
+    Shop
+};
+
+struct GraphicsData
+{
+    Rectangle screenRec;
+
+    enum MMRec
+    {
+        MainTitleRec = 0,
+        SubtitleRec = 1 // currently unsused
+    };
+    vector<Rectangle> mainMenuRecs;
+
+    enum GSRec
+    {
+        SimRec = 0,
+        MenuRec = 1,
+    };
+    vector<Rectangle> gameStateRecs;
+    vector<Rectangle> wallRecs;
+
+    enum SRec
+    {
+        ShopTitleRec = 0,
+        OptionsRec = 1
+    };
+    vector<Rectangle> shopRecs;
 };
 
 // Rectangle helpers

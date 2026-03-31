@@ -1,22 +1,10 @@
 #include "graphics.h"
 
-Graphics::Graphics()
+Graphics::Graphics(GraphicsData data, BallManager *ballManager)
 {
-    // Set graphics data
-    float simPercent = 0.75;
-    data.screenRec = {
-        0, 0,
-        static_cast<float>(GetScreenWidth()),
-        static_cast<float>(GetScreenHeight())};
-    data.simRec = {
-        0, 0,
-        data.screenRec.width * simPercent,
-        data.screenRec.height};
-    data.menuRec = {
-        data.simRec.x + data.simRec.width,
-        0,
-        data.screenRec.width - data.simRec.width,
-        data.screenRec.height};
+    this->data = data;
+    this->ballManager = ballManager;
+    ballWalls = data.wallRecs;
 
     // Set colors
     colors.push_back(BLACK); // background
@@ -43,21 +31,13 @@ void Graphics::printState(State state)
         printGame();
         break;
 
-    case State::Settings:
-        printSettings();
+    case State::Shop:
+        printShop();
         break;
     }
 
     DrawFPS(10, 10);
     EndDrawing();
-}
-
-// Gets pointer and rectangle wall vector
-void Graphics::getBallManagerPtr(BallManager *ballManager)
-{
-    this->ballManager = ballManager;
-
-    ballWalls = ballManager->getWalls();
 }
 
 // private
@@ -66,7 +46,10 @@ void Graphics::printMainMenu()
     string text = "Ball Simulation";
     int titleFontSize = 20;
 
-    Point titlePoint = centerTextInRec(data.screenRec, text, titleFontSize);
+    Point titlePoint = centerTextInRec(
+        data.mainMenuRecs[GraphicsData::MainTitleRec],
+        text,
+        titleFontSize);
 
     DrawText(text.c_str(), titlePoint.x, titlePoint.y, titleFontSize, colors[TitleText]);
 }
@@ -74,8 +57,8 @@ void Graphics::printMainMenu()
 void Graphics::printGame()
 {
     // background rectangles
-    DrawRectangleRec(data.simRec, colors[SimBackground]);
-    DrawRectangleRec(data.menuRec, colors[MenuBackground]);
+    DrawRectangleRec(data.gameStateRecs[GraphicsData::SimRec], colors[SimBackground]);
+    DrawRectangleRec(data.gameStateRecs[GraphicsData::MenuRec], colors[MenuBackground]);
 
     // wall rectangles
     for (Rectangle &rec : ballWalls)
@@ -87,39 +70,30 @@ void Graphics::printGame()
     printBalls();
 }
 
-void Graphics::printSettings()
+void Graphics::printShop()
 {
-    int horizontalBuffer = 0.20 * data.screenRec.width;
-    int verticalBuffer = 0.20 * data.screenRec.height;
-
-    float titleRecPercent = 0.25;
-
-    Rectangle titleRec = {
-        data.screenRec.x + horizontalBuffer,
-        data.screenRec.y + verticalBuffer,
-        data.screenRec.width - horizontalBuffer * 2,
-        data.screenRec.height * titleRecPercent - verticalBuffer};
-
-    Rectangle optionsRec = {
-        titleRec.x,
-        titleRec.y + titleRec.height,
-        titleRec.width,
-        data.screenRec.height - (verticalBuffer * 2) - titleRec.height};
-
-    // Draw title
     string titleText = "Settings";
     int titleFontSize = 20;
+    Rectangle titleRec = data.shopRecs[GraphicsData::ShopTitleRec];
+
     Point titlePoint = centerTextInRec(titleRec, titleText, titleFontSize);
 
+    // Draw title
     DrawRectangleRec(titleRec, WHITE);
     DrawText(titleText.c_str(), titlePoint.x, titlePoint.y, titleFontSize, colors[SettingsText]);
 
     // Draw Options
+    Rectangle optionsRec = data.shopRecs[GraphicsData::OptionsRec];
     DrawRectangleRec(optionsRec, GRAY);
 }
 
 void Graphics::printBalls()
 {
+    if (ballManager == nullptr)
+    {
+        return;
+    }
+
     for (Ball *b : ballManager->balls)
     {
         DrawCircle(b->point.x, b->point.y, b->radius, rgbToColor(b->ballColor));
