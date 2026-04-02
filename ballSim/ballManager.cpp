@@ -13,11 +13,11 @@ BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls)
     maxVelocity = {ballRec.width / screenSizeDivisior, ballRec.height / screenSizeDivisior};
 
     // Testing add default balls
-    int numBalls = 4;
-    for (int i = 0; i < numBalls; i++)
-    {
-        addBallCenter();
-    }
+    // int numBalls = 4;
+    // for (int i = 0; i < numBalls; i++)
+    // {
+    //     addBallCenter();
+    // }
 }
 
 BallManager::~BallManager()

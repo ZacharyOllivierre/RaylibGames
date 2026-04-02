@@ -12,23 +12,28 @@ int main()
     InitWindow(screenWidth, screenHeight, "ball sim");
     SetTargetFPS(60);
 
-    State state = State::Game;
+    // Init data structs
+    ProgramState programState;
     GraphicsData data;
+
+    // Init and build graphics rectangles
     BuildRecs recs(static_cast<float>(screenWidth), static_cast<float>(screenHeight));
 
+    // Set data from buildRecs
     data = recs.buildGraphicsData();
 
+    // Init main classes with data
     BallManager ballManager(data.gameStateRecs[GraphicsData::SimRec], data.wallRecs);
     Graphics graphics(data, &ballManager);
-
-    // Control control(&state);
+    Control control(&programState, &ballManager, &data);
 
     while (!WindowShouldClose())
     {
-        graphics.printState(state);
-        // control.controlsForState(state);
+        graphics.printState(programState.state);
+        control.controlsForState(programState.state);
 
-        if (state == State::Game)
+        // update balls if in game state and not paused
+        if (programState.state == State::Game && !programState.paused)
         {
             ballManager.updateBalls();
         }

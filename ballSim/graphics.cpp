@@ -44,6 +44,7 @@ void Graphics::printState(State state)
 void Graphics::printMainMenu()
 {
     string text = "Ball Simulation";
+    string subText = "Click to continue";
     int titleFontSize = 20;
 
     Point titlePoint = centerTextInRec(
@@ -51,7 +52,24 @@ void Graphics::printMainMenu()
         text,
         titleFontSize);
 
-    DrawText(text.c_str(), titlePoint.x, titlePoint.y, titleFontSize, colors[TitleText]);
+    Point subTitlePoint = centerTextInRec(
+        data.mainMenuRecs[GraphicsData::SubtitleRec],
+        subText,
+        titleFontSize);
+
+    DrawText(
+        text.c_str(),
+        titlePoint.x,
+        titlePoint.y,
+        titleFontSize,
+        colors[TitleText]);
+
+    DrawText(
+        subText.c_str(),
+        subTitlePoint.x,
+        subTitlePoint.y,
+        titleFontSize,
+        colors[TitleText]);
 }
 
 void Graphics::printGame()

@@ -7,6 +7,8 @@ Ball::Ball(Point p, Velocity maxSpeed, Velocity v, int radius)
     this->radius = radius;
 
     maxVelocity = maxSpeed;
+
+    updateColor();
 }
 
 void Ball::update()

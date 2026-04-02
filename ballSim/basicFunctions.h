@@ -26,6 +26,12 @@ enum class State
     Shop
 };
 
+struct ProgramState
+{
+    State state = State::Main;
+    bool paused = false;
+};
+
 struct GraphicsData
 {
     Rectangle screenRec;
@@ -57,6 +63,8 @@ struct GraphicsData
 int getCenterX(Rectangle &rec);
 int getCenterY(Rectangle &rec);
 Point getCenter(Rectangle &rec);
+
+bool pointWithinRec(Vector2 &pos, Rectangle &rec);
 
 // Color
 Color rgbToColor(RGB color);
