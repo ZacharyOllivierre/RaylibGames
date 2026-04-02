@@ -1,6 +1,9 @@
 #pragma once
 #include "basicFunctions.h"
 #include <cmath>
+#include <vector>
+
+using std::vector;
 
 // Update to acceleration
 struct Velocity
@@ -21,6 +24,7 @@ class Ball
 {
 private:
     Velocity velocity;
+
     Velocity maxVelocity;
 
     void updateColor();
@@ -30,9 +34,13 @@ public:
     Point point;
     RGB ballColor;
 
-    Ball(Point p, Velocity maxSpeed, Velocity v = {0, 0}, int radius = 10);
+    /*Used so that points only given on first instance of
+    collision (rolling). Follows wallSide enum*/
+    vector<bool> collisionTracker;
 
-    void update();
+    Ball(Point p, Velocity ms, Velocity v = {0, 0}, int r = 15);
 
-    void collision(WallSide side);
+    void update(float gravity);
+
+    void collision(WallSide side, float bc, float f);
 };

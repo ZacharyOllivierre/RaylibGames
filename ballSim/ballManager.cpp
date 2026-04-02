@@ -1,23 +1,21 @@
 #include "ballManager.h"
 #include <iostream>
 
-BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls)
+BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls, Player *player)
 {
     this->ballRec = ballRec;
     this->walls = walls;
+    this->player = player;
 
     srand(time(nullptr));
 
     // 7 is about ideal
-    int screenSizeDivisior = 10;
+    int screenSizeDivisior = 25;
     maxVelocity = {ballRec.width / screenSizeDivisior, ballRec.height / screenSizeDivisior};
 
-    // Testing add default balls
-    // int numBalls = 4;
-    // for (int i = 0; i < numBalls; i++)
-    // {
-    //     addBallCenter();
-    // }
+    bounceCoefficient = 0.9;
+    friction = 0.95;
+    gravity = 1;
 }
 
 BallManager::~BallManager()
@@ -45,7 +43,7 @@ void BallManager::updateBalls()
 {
     for (Ball *ball : balls)
     {
-        ball->update();
+        ball->update(gravity);
 
         checkWallCollisions(ball);
     }
@@ -53,11 +51,6 @@ void BallManager::updateBalls()
 
 void BallManager::checkWallCollisions(Ball *ball)
 {
-    if (walls.size() < 4)
-    {
-        return;
-    }
-
     int ballLeft = ball->point.x - ball->radius;
     int ballRight = ball->point.x + ball->radius;
     int ballTop = ball->point.y - ball->radius;
@@ -68,26 +61,76 @@ void BallManager::checkWallCollisions(Ball *ball)
     int wallTop = walls[Top].y + walls[Top].height;
     int wallBottom = walls[Bottom].y;
 
-    // Check for collisions or past collision
-    if (ballLeft < wallLeft)
+    // make this a for loop, repeatable instead of seperate if else
+    // check for collisions
+    if (ballLeft <= wallLeft)
     {
-        ball->collision(Left);
+        // collide and rebound
+        ball->collision(Left, bounceCoefficient, friction);
         ball->point.x = wallLeft + ball->radius;
+
+        // if collision has not happened on last frame add points
+        if (!ball->collisionTracker[Left])
+        {
+            // add points for collision
+            player->addPoints();
+
+            // set current collision to collision type
+            ball->collisionTracker[Left] = true;
+        }
     }
-    else if (ballRight > wallRight)
+    else
     {
-        ball->collision(Right);
+        ball->collisionTracker[Left] = false;
+    }
+
+    if (ballRight >= wallRight)
+    {
+        ball->collision(Right, bounceCoefficient, friction);
         ball->point.x = wallRight - ball->radius;
+
+        if (!ball->collisionTracker[Right])
+        {
+            player->addPoints();
+            ball->collisionTracker[Right] = true;
+        }
     }
-    else if (ballTop < wallTop)
+    else
     {
-        ball->collision(Top);
+        ball->collisionTracker[Right] = false;
+    }
+
+    if (ballTop <= wallTop)
+    {
+        ball->collision(Top, bounceCoefficient, friction);
         ball->point.y = wallTop + ball->radius;
+
+        if (!ball->collisionTracker[Top])
+        {
+            player->addPoints();
+            ball->collisionTracker[Top] = true;
+        }
     }
-    else if (ballBottom > wallBottom)
+    else
     {
-        ball->collision(Bottom);
+        ball->collisionTracker[Top] = false;
+    }
+
+    if (ballBottom >= wallBottom)
+    {
+        ball->collision(Bottom, bounceCoefficient, friction);
         ball->point.y = wallBottom - ball->radius;
+
+        if (!ball->collisionTracker[Bottom])
+        {
+            player->addPoints();
+
+            ball->collisionTracker[Bottom] = true;
+        }
+    }
+    else
+    {
+        ball->collisionTracker[Bottom] = false;
     }
 }
 

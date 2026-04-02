@@ -1,18 +1,20 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData data, BallManager *ballManager)
+Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player)
 {
     this->data = data;
     this->ballManager = ballManager;
+    this->player = player;
     ballWalls = data.wallRecs;
 
     // Set colors
-    colors.push_back(BLACK); // background
-    colors.push_back(WHITE); // simulation background
-    colors.push_back(GRAY);  // menu background
-    colors.push_back(BLACK); // Wall color
-    colors.push_back(RED);   // title text
-    colors.push_back(GREEN); // setting text
+    colors.push_back(BLACK);  // background
+    colors.push_back(WHITE);  // simulation background
+    colors.push_back(GRAY);   // menu background
+    colors.push_back(BLACK);  // Wall color
+    colors.push_back(RED);    // title text
+    colors.push_back(GREEN);  // setting text
+    colors.push_back(YELLOW); // score text
 }
 
 void Graphics::printState(State state)
@@ -86,6 +88,8 @@ void Graphics::printGame()
 
     // draw balls
     printBalls();
+
+    printScore();
 }
 
 void Graphics::printShop()
@@ -116,6 +120,21 @@ void Graphics::printBalls()
     {
         DrawCircle(b->point.x, b->point.y, b->radius, rgbToColor(b->ballColor));
     }
+}
+
+void Graphics::printScore()
+{
+    int fontSize = 30;
+
+    string text = "Score: ";
+    text += std::to_string(player->getPoints());
+
+    Rectangle scoreRec = data.gameStateRecs[GraphicsData::SimRec];
+    scoreRec.height = fontSize + (fontSize / 2);
+
+    Point scorePoint = centerTextInRec(scoreRec, text, fontSize);
+
+    DrawText(text.c_str(), scorePoint.x, scorePoint.y, fontSize, colors[ScoreText]);
 }
 
 Point Graphics::centerTextInRec(Rectangle &rec, string &text, int fontSize)

@@ -1,27 +1,30 @@
 #include "ball.h"
+#include <iostream>
 
-Ball::Ball(Point p, Velocity maxSpeed, Velocity v, int radius)
+Ball::Ball(Point p, Velocity ms, Velocity v, int r)
 {
     point = p;
+    maxVelocity = ms;
     velocity = v;
-    this->radius = radius;
+    radius = r;
 
-    maxVelocity = maxSpeed;
+    collisionTracker = {
+        false,
+        false,
+        false,
+        false,
+    };
 
     updateColor();
 }
 
-void Ball::update()
+void Ball::update(float gravity)
 {
+    velocity.yVel += gravity;
+
     // clamp max speed
-    if (velocity.xVel > maxVelocity.xVel)
-    {
-        velocity.xVel = maxVelocity.xVel;
-    }
-    if (velocity.yVel > maxVelocity.yVel)
-    {
-        velocity.yVel = maxVelocity.yVel;
-    }
+    velocity.xVel = std::clamp(velocity.xVel, -maxVelocity.xVel, maxVelocity.xVel);
+    velocity.yVel = std::clamp(velocity.yVel, -maxVelocity.yVel, maxVelocity.yVel);
 
     // Update position by velocity
     point.x += velocity.xVel;
@@ -31,24 +34,21 @@ void Ball::update()
     updateColor();
 }
 
-void Ball::collision(WallSide side)
+void Ball::collision(WallSide side, float bc, float f)
 {
+    // Apply friction in x on floor and ceiling
     switch (side)
     {
-    case Left:
-        velocity.xVel *= -1;
-        break;
-
     case Top:
-        velocity.yVel *= -1;
-        break;
-
-    case Right:
-        velocity.xVel *= -1;
-        break;
-
     case Bottom:
-        velocity.yVel *= -1;
+        velocity.yVel *= (-1 * bc);
+        velocity.xVel *= f;
+        break;
+
+    case Left:
+    case Right:
+        velocity.xVel *= (-1 * bc);
+        // velocity.yVel *= f;
         break;
     }
 }

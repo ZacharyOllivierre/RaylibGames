@@ -3,6 +3,7 @@
 #include "graphics.h"
 #include "control.h"
 #include "buildRecs.h"
+#include "player.h"
 
 int main()
 {
@@ -23,8 +24,9 @@ int main()
     data = recs.buildGraphicsData();
 
     // Init main classes with data
-    BallManager ballManager(data.gameStateRecs[GraphicsData::SimRec], data.wallRecs);
-    Graphics graphics(data, &ballManager);
+    Player player;
+    BallManager ballManager(data.gameStateRecs[GraphicsData::SimRec], data.wallRecs, &player);
+    Graphics graphics(data, &ballManager, &player);
     Control control(&programState, &ballManager, &data);
 
     while (!WindowShouldClose())

@@ -32,6 +32,7 @@ struct ProgramState
     bool paused = false;
 };
 
+// this is bad
 struct GraphicsData
 {
     Rectangle screenRec;
@@ -57,6 +58,12 @@ struct GraphicsData
         OptionsRec = 1
     };
     vector<Rectangle> shopRecs;
+
+    enum bRec
+    {
+
+    };
+    vector<Rectangle> buttonRecs;
 };
 
 // Rectangle helpers
