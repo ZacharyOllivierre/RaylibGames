@@ -6,8 +6,15 @@ using std::string;
 
 enum ButtonType
 {
-    GameToMainMenu = 0,
-    GameToShop = 1,
+    GameToMainMenu,
+    GameToShop,
+    GameJoltBalls,
+    ShopToGame,
+    ShopAddBall,
+    ShopIncreaseBounce,
+    ShopReduceFriction,
+    ShopReduceGravity,
+    ShopIncreaseJolt,
 };
 
 struct Button

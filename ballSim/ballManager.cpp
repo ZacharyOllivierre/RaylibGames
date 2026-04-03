@@ -1,5 +1,4 @@
 #include "ballManager.h"
-#include <iostream>
 
 BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls, Player *player)
 {
@@ -10,12 +9,14 @@ BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls, Play
     srand(time(nullptr));
 
     // 7 is about ideal
-    int screenSizeDivisior = 25;
+    int screenSizeDivisior = 7;
     maxVelocity = {ballRec.width / screenSizeDivisior, ballRec.height / screenSizeDivisior};
 
     bounceCoefficient = 0.9;
-    friction = 0.95;
+    friction = 0.9;
     gravity = 1;
+
+    joltPercent = 0.3;
 }
 
 BallManager::~BallManager()
@@ -131,6 +132,17 @@ void BallManager::checkWallCollisions(Ball *ball)
     else
     {
         ball->collisionTracker[Bottom] = false;
+    }
+}
+
+void BallManager::joltBalls()
+{
+    for (Ball *ball : balls)
+    {
+        Velocity v = getRandomVelocity({maxVelocity.xVel * joltPercent,
+                                        maxVelocity.yVel * joltPercent});
+
+        ball->addVelocity(v);
     }
 }
 

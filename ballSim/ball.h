@@ -43,4 +43,6 @@ public:
     void update(float gravity);
 
     void collision(WallSide side, float bc, float f);
+
+    void addVelocity(Velocity v);
 };

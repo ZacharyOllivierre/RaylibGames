@@ -48,9 +48,17 @@ void Ball::collision(WallSide side, float bc, float f)
     case Left:
     case Right:
         velocity.xVel *= (-1 * bc);
-        // velocity.yVel *= f;
         break;
     }
+}
+
+void Ball::addVelocity(Velocity v)
+{
+    v.xVel = abs(v.xVel);
+    v.yVel = abs(v.yVel);
+
+    velocity.xVel > 0 ? velocity.xVel += v.xVel : velocity.xVel -= v.xVel;
+    velocity.yVel > 0 ? velocity.yVel *= -1 + v.yVel : velocity.yVel -= v.yVel;
 }
 
 void Ball::updateColor()

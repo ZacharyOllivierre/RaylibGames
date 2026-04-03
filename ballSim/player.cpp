@@ -2,7 +2,7 @@
 
 Player::Player()
 {
-    points = 0;
+    points = 20000000;
 }
 
 void Player::addPoints(int points)

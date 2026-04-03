@@ -1,22 +1,26 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, vector<Button> buttons)
+Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> buttons)
 {
     this->data = data;
     this->ballManager = ballManager;
     this->player = player;
+    this->shop = shop;
     ballWalls = data.wallRecs;
 
     this->buttons = buttons;
 
     // Set colors
-    colors.push_back(BLACK);  // background
-    colors.push_back(WHITE);  // simulation background
-    colors.push_back(GRAY);   // menu background
-    colors.push_back(BLACK);  // Wall color
-    colors.push_back(RED);    // title text
-    colors.push_back(GREEN);  // setting text
-    colors.push_back(YELLOW); // score text
+    colors.push_back(BLACK);     // background
+    colors.push_back(BLACK);     // simulation background
+    colors.push_back(DARKGRAY);  // menu background
+    colors.push_back(WHITE);     // Wall color
+    colors.push_back(RED);       // title text
+    colors.push_back(GREEN);     // setting text
+    colors.push_back(YELLOW);    // score text
+    colors.push_back(BLACK);     // button text
+    colors.push_back(RED);       // button base
+    colors.push_back(LIGHTGRAY); // button border
 }
 
 void Graphics::printState(State state)
@@ -95,11 +99,14 @@ void Graphics::printGame()
 
     printButton(buttons[GameToMainMenu]);
     printButton(buttons[GameToShop]);
+    printButton(buttons[GameJoltBalls]);
 }
 
 void Graphics::printShop()
 {
-    string titleText = "Shop";
+    int currentScore = player->getPoints();
+
+    string titleText = "Shop - Coins : " + std::to_string(currentScore);
     int titleFontSize = 20;
     Rectangle titleRec = data.shopRecs[GraphicsData::ShopTitleRec];
 
@@ -112,6 +119,40 @@ void Graphics::printShop()
     // Draw Options
     Rectangle optionsRec = data.shopRecs[GraphicsData::OptionsRec];
     DrawRectangleRec(optionsRec, GRAY);
+
+    // print back button
+    printButton(buttons[ShopToGame]);
+
+    // print shop item buttons
+    printButton(buttons[ShopAddBall]);
+    printButton(buttons[ShopIncreaseBounce]);
+    printButton(buttons[ShopReduceFriction]);
+    printButton(buttons[ShopReduceGravity]);
+    printButton(buttons[ShopIncreaseJolt]);
+
+    // print prices for items
+    int fontSize = 20;
+    int spaceBelow = 3;
+    centerTextBelowRecPrint(buttons[ShopAddBall].rec,
+                            shop->getPriceS(ShopItem::AddBall),
+                            fontSize,
+                            spaceBelow);
+    centerTextBelowRecPrint(buttons[ShopIncreaseBounce].rec,
+                            shop->getPriceS(ShopItem::IncreaseBounce),
+                            fontSize,
+                            spaceBelow);
+    centerTextBelowRecPrint(buttons[ShopReduceFriction].rec,
+                            shop->getPriceS(ShopItem::ReduceFriction),
+                            fontSize,
+                            spaceBelow);
+    centerTextBelowRecPrint(buttons[ShopReduceGravity].rec,
+                            shop->getPriceS(ShopItem::ReduceGravity),
+                            fontSize,
+                            spaceBelow);
+    centerTextBelowRecPrint(buttons[ShopIncreaseJolt].rec,
+                            shop->getPriceS(ShopItem::JoltPercent),
+                            fontSize,
+                            spaceBelow);
 }
 
 void Graphics::printBalls()
@@ -131,11 +172,11 @@ void Graphics::printScore()
 {
     int fontSize = 30;
 
-    string text = "Score: ";
+    string text = "Coins: ";
     text += std::to_string(player->getPoints());
 
     Rectangle scoreRec = data.gameStateRecs[GraphicsData::SimRec];
-    scoreRec.height = fontSize + (fontSize / 2);
+    scoreRec.height = fontSize + (fontSize / 1.5);
 
     Point scorePoint = centerTextInRec(scoreRec, text, fontSize);
 
@@ -146,19 +187,37 @@ void Graphics::printButton(Button button)
 {
     string text = button.label;
     int fontsize = 20;
+    int borderThickness = 5;
     Point textPoint = centerTextInRec(button.rec, text, fontsize);
 
-    DrawRectangleRec(button.rec, RED);
-    DrawText(text.c_str(), textPoint.x, textPoint.y, fontsize, WHITE);
+    DrawRectangleRec(button.rec, colors[ButtonBase]);
+    DrawRectangleLinesEx(button.rec, borderThickness, colors[ButtonBorder]);
+
+    DrawText(text.c_str(), textPoint.x, textPoint.y, fontsize, colors[ButtonText]);
 }
 
-Point Graphics::centerTextInRec(Rectangle &rec, string &text, int fontSize)
+Point Graphics::centerTextInRec(Rectangle &rec, string text, int fontSize)
 {
+    Font font = GetFontDefault();
     Point p;
-    int textWidth = MeasureText(text.c_str(), fontSize);
+    int spacing = 1;
+    Vector2 textWidth = MeasureTextEx(font, text.c_str(), fontSize, spacing);
 
-    p.x = getCenterX(rec) - (textWidth / 2);
-    p.y = getCenterY(rec);
+    p.x = (int)(getCenterX(rec) - textWidth.x / 2.0f);
+    p.y = (int)(getCenterY(rec) - textWidth.y / 2.0f);
 
     return p;
+}
+
+void Graphics::centerTextBelowRecPrint(Rectangle &rec, string text, int fontSize, int spacingBelow)
+{
+    Font font = GetFontDefault();
+    Point p;
+    int spacing = 1;
+    Vector2 textDim = MeasureTextEx(font, text.c_str(), fontSize, spacing);
+
+    p.x = getCenterX(rec) - (textDim.x / 2);
+    p.y = rec.y + rec.height + spacingBelow;
+
+    DrawTextEx(font, text.c_str(), {p.x, p.y}, fontSize, spacing, colors[ButtonText]);
 }

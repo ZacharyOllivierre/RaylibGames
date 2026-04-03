@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "basicFunctions.h"
 #include "button.h"
+#include "shop.h"
 
 #include <vector>
 #include <string>
@@ -19,6 +20,9 @@ enum ColorWheel
     TitleText,
     SettingsText,
     ScoreText,
+    ButtonText,
+    ButtonBase,
+    ButtonBorder,
 };
 
 class Graphics
@@ -28,6 +32,8 @@ private:
 
     BallManager *ballManager;
     Player *player;
+    Shop *shop;
+
     vector<Button> buttons;
 
     vector<Rectangle> ballWalls;
@@ -42,10 +48,11 @@ private:
 
     void printButton(Button button);
 
-    Point centerTextInRec(Rectangle &rec, string &text, int fontSize);
+    Point centerTextInRec(Rectangle &rec, string text, int fontSize);
+    void centerTextBelowRecPrint(Rectangle &rec, string text, int fontSize, int spacingBelow);
 
 public:
-    Graphics(GraphicsData data, BallManager *ballManager, Player *player, vector<Button> buttons);
+    Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> buttons);
 
     void printState(State state);
 

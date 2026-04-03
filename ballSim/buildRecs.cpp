@@ -116,17 +116,53 @@ void BuildRecs::buildWallRecs(float wallWidth)
 
 void BuildRecs::buildButtonRecs()
 {
-    Rectangle *menuRec = &data.gameStateRecs[GraphicsData::MenuRec];
-
     // game menu to main menu
+    Rectangle *menuRec = &data.gameStateRecs[GraphicsData::MenuRec];
     buttonRecs.push_back({menuRec->x,
-                          menuRec->y + menuRec->height * 0.75f,
+                          menuRec->y + menuRec->height * 0.9f,
                           menuRec->width,
-                          menuRec->height - menuRec->height * 0.75f});
-
+                          menuRec->height - menuRec->height * 0.9f});
     // game to shop
     buttonRecs.push_back({buttonRecs[0].x,
                           buttonRecs[0].y - buttonRecs[0].height,
                           buttonRecs[0].width,
                           buttonRecs[0].height});
+    // game jolt balls
+    buttonRecs.push_back({menuRec->x,
+                          menuRec->y,
+                          menuRec->width,
+                          buttonRecs[0].height});
+    // shop to game
+    Rectangle *shopOpRec = &data.shopRecs[GraphicsData::OptionsRec];
+    buttonRecs.push_back({shopOpRec->x,
+                          shopOpRec->y + shopOpRec->height * .90f,
+                          shopOpRec->width * .20f,
+                          shopOpRec->height * .10f});
+    // Shop add ball
+    int shopItemHorSpace = 40;
+    int shopItemVirSpace = 40;
+    buttonRecs.push_back({shopOpRec->x,
+                          shopOpRec->y,
+                          shopOpRec->width * .20f,
+                          shopOpRec->height * .20f});
+    // shop increase bounce
+    buttonRecs.push_back({buttonRecs[4].x + buttonRecs[4].width + shopItemHorSpace,
+                          buttonRecs[4].y,
+                          buttonRecs[4].width,
+                          buttonRecs[4].height});
+    // shop reduce friction
+    buttonRecs.push_back({buttonRecs[4].x,
+                          buttonRecs[4].y + buttonRecs[4].height + shopItemVirSpace,
+                          buttonRecs[4].width,
+                          buttonRecs[4].height});
+    // shop reduce gravity
+    buttonRecs.push_back({buttonRecs[5].x,
+                          buttonRecs[6].y,
+                          buttonRecs[4].width,
+                          buttonRecs[4].height});
+    // shop increase jolt
+    buttonRecs.push_back({buttonRecs[5].x + buttonRecs[5].width + shopItemHorSpace,
+                          buttonRecs[4].y,
+                          buttonRecs[4].width,
+                          buttonRecs[4].height});
 }
