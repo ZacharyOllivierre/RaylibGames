@@ -2,6 +2,7 @@
 #include "ballManager.h"
 #include "raylib.h"
 #include "basicFunctions.h"
+#include "button.h"
 
 #include <vector>
 #include <string>
@@ -27,6 +28,7 @@ private:
 
     BallManager *ballManager;
     Player *player;
+    vector<Button> buttons;
 
     vector<Rectangle> ballWalls;
     vector<Color> colors;
@@ -38,10 +40,12 @@ private:
     void printBalls();
     void printScore();
 
+    void printButton(Button button);
+
     Point centerTextInRec(Rectangle &rec, string &text, int fontSize);
 
 public:
-    Graphics(GraphicsData data, BallManager *ballManager, Player *player);
+    Graphics(GraphicsData data, BallManager *ballManager, Player *player, vector<Button> buttons);
 
     void printState(State state);
 

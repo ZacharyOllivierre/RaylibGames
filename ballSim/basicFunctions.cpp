@@ -15,21 +15,6 @@ Point getCenter(Rectangle &rec)
     return {(float)getCenterX(rec), (float)getCenterY(rec)};
 }
 
-bool pointWithinRec(Vector2 &pos, Rectangle &rec)
-{
-    bool within = true;
-
-    if (pos.x < rec.x || pos.x > (rec.x + rec.width))
-    {
-        within = false;
-    }
-    else if (pos.y < rec.y || pos.y > (rec.y + rec.height))
-    {
-        within = false;
-    }
-    return within;
-}
-
 Color rgbToColor(RGB color)
 {
     Color myColor = {color.r, color.g, color.b, color.a};

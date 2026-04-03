@@ -40,7 +40,7 @@ struct GraphicsData
     enum MMRec
     {
         MainTitleRec = 0,
-        SubtitleRec = 1 // currently unsused
+        SubtitleRec = 1
     };
     vector<Rectangle> mainMenuRecs;
 
@@ -58,20 +58,12 @@ struct GraphicsData
         OptionsRec = 1
     };
     vector<Rectangle> shopRecs;
-
-    enum bRec
-    {
-
-    };
-    vector<Rectangle> buttonRecs;
 };
 
 // Rectangle helpers
 int getCenterX(Rectangle &rec);
 int getCenterY(Rectangle &rec);
 Point getCenter(Rectangle &rec);
-
-bool pointWithinRec(Vector2 &pos, Rectangle &rec);
 
 // Color
 Color rgbToColor(RGB color);

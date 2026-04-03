@@ -1,11 +1,13 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player)
+Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, vector<Button> buttons)
 {
     this->data = data;
     this->ballManager = ballManager;
     this->player = player;
     ballWalls = data.wallRecs;
+
+    this->buttons = buttons;
 
     // Set colors
     colors.push_back(BLACK);  // background
@@ -90,11 +92,14 @@ void Graphics::printGame()
     printBalls();
 
     printScore();
+
+    printButton(buttons[GameToMainMenu]);
+    printButton(buttons[GameToShop]);
 }
 
 void Graphics::printShop()
 {
-    string titleText = "Settings";
+    string titleText = "Shop";
     int titleFontSize = 20;
     Rectangle titleRec = data.shopRecs[GraphicsData::ShopTitleRec];
 
@@ -135,6 +140,16 @@ void Graphics::printScore()
     Point scorePoint = centerTextInRec(scoreRec, text, fontSize);
 
     DrawText(text.c_str(), scorePoint.x, scorePoint.y, fontSize, colors[ScoreText]);
+}
+
+void Graphics::printButton(Button button)
+{
+    string text = button.label;
+    int fontsize = 20;
+    Point textPoint = centerTextInRec(button.rec, text, fontsize);
+
+    DrawRectangleRec(button.rec, RED);
+    DrawText(text.c_str(), textPoint.x, textPoint.y, fontsize, WHITE);
 }
 
 Point Graphics::centerTextInRec(Rectangle &rec, string &text, int fontSize)

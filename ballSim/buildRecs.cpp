@@ -4,6 +4,7 @@ BuildRecs::BuildRecs(float screenWidth, float screenHeight)
 {
     data.screenRec = {0, 0, screenWidth, screenHeight};
     buildGraphicsData();
+    buildButtonRecs();
 }
 
 GraphicsData BuildRecs::buildGraphicsData()
@@ -58,10 +59,10 @@ void BuildRecs::buildGameStateRecs()
 
 void BuildRecs::buildShopRecs()
 {
-    int horizontalBuffer = 0.20 * data.screenRec.width;
-    int verticalBuffer = 0.20 * data.screenRec.height;
+    int horizontalBuffer = 0.05 * data.screenRec.width;
+    int verticalBuffer = 0.05 * data.screenRec.height;
 
-    float titleRecPercent = 0.25;
+    float titleRecPercent = 0.15;
 
     Rectangle titleRec = {
         data.screenRec.x + horizontalBuffer,
@@ -111,4 +112,21 @@ void BuildRecs::buildWallRecs(float wallWidth)
     data.wallRecs.push_back(topWall);
     data.wallRecs.push_back(rightWall);
     data.wallRecs.push_back(bottomWall);
+}
+
+void BuildRecs::buildButtonRecs()
+{
+    Rectangle *menuRec = &data.gameStateRecs[GraphicsData::MenuRec];
+
+    // game menu to main menu
+    buttonRecs.push_back({menuRec->x,
+                          menuRec->y + menuRec->height * 0.75f,
+                          menuRec->width,
+                          menuRec->height - menuRec->height * 0.75f});
+
+    // game to shop
+    buttonRecs.push_back({buttonRecs[0].x,
+                          buttonRecs[0].y - buttonRecs[0].height,
+                          buttonRecs[0].width,
+                          buttonRecs[0].height});
 }
