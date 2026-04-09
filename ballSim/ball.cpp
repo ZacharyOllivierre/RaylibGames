@@ -58,7 +58,7 @@ void Ball::addVelocity(Velocity v)
     v.yVel = abs(v.yVel);
 
     velocity.xVel > 0 ? velocity.xVel += v.xVel : velocity.xVel -= v.xVel;
-    velocity.yVel > 0 ? velocity.yVel *= -1 + v.yVel : velocity.yVel -= v.yVel;
+    velocity.yVel -= v.yVel;
 }
 
 void Ball::updateColor()

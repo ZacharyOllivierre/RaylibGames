@@ -12,6 +12,7 @@ enum class ShopItem
     ReduceFriction,
     ReduceGravity,
     JoltPercent,
+    IncreaseGravity,
     COUNT
 };
 

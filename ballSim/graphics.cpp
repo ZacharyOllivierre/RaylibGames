@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> buttons)
+Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> *buttons)
 {
     this->data = data;
     this->ballManager = ballManager;
@@ -21,11 +21,20 @@ Graphics::Graphics(GraphicsData data, BallManager *ballManager, Player *player, 
     colors.push_back(BLACK);     // button text
     colors.push_back(RED);       // button base
     colors.push_back(LIGHTGRAY); // button border
+
+    canvas = LoadRenderTexture(data.screenRec.width, data.screenRec.height);
+}
+
+Graphics::~Graphics()
+{
+    UnloadRenderTexture(canvas);
 }
 
 void Graphics::printState(State state)
 {
-    BeginDrawing();
+    // to add dynamic window sizing graphics data needs to not be copied by value - fix
+    // create scene in texture and paste texture onto screen rec
+    BeginTextureMode(canvas);
 
     ClearBackground(colors[Background]);
 
@@ -43,17 +52,33 @@ void Graphics::printState(State state)
         printShop();
         break;
     }
-
     DrawFPS(10, 10);
+
+    EndTextureMode();
+
+    // draw texture to screen
+    BeginDrawing();
+    ClearBackground(colors[Background]);
+
+    Rectangle sourceRec = {0, 0, (float)canvas.texture.width, -(float)canvas.texture.height};
+    Rectangle destRec = {0, 0, (float)data.screenRec.width, (float)data.screenRec.height};
+
+    DrawTexturePro(
+        canvas.texture,
+        sourceRec,
+        destRec,
+        {0.0f, 0.0f},
+        0.0f,
+        WHITE);
     EndDrawing();
 }
 
 // private
 void Graphics::printMainMenu()
 {
-    string text = "Ball Simulation";
-    string subText = "Click to continue";
-    int titleFontSize = 20;
+    string text = "Bounce";
+    string subText = "Spacebar to Continue";
+    int titleFontSize = 80;
 
     Point titlePoint = centerTextInRec(
         data.mainMenuRecs[GraphicsData::MainTitleRec],
@@ -63,7 +88,7 @@ void Graphics::printMainMenu()
     Point subTitlePoint = centerTextInRec(
         data.mainMenuRecs[GraphicsData::SubtitleRec],
         subText,
-        titleFontSize);
+        titleFontSize / 2);
 
     DrawText(
         text.c_str(),
@@ -76,7 +101,7 @@ void Graphics::printMainMenu()
         subText.c_str(),
         subTitlePoint.x,
         subTitlePoint.y,
-        titleFontSize,
+        titleFontSize / 2,
         colors[TitleText]);
 }
 
@@ -97,9 +122,9 @@ void Graphics::printGame()
 
     printScore();
 
-    printButton(buttons[GameToMainMenu]);
-    printButton(buttons[GameToShop]);
-    printButton(buttons[GameJoltBalls]);
+    printButton((*buttons)[GameToMainMenu]);
+    printButton((*buttons)[GameToShop]);
+    printButton((*buttons)[GameJoltBalls]);
 }
 
 void Graphics::printShop()
@@ -107,7 +132,7 @@ void Graphics::printShop()
     int currentScore = player->getPoints();
 
     string titleText = "Shop - Coins : " + std::to_string(currentScore);
-    int titleFontSize = 20;
+    int titleFontSize = 60;
     Rectangle titleRec = data.shopRecs[GraphicsData::ShopTitleRec];
 
     Point titlePoint = centerTextInRec(titleRec, titleText, titleFontSize);
@@ -121,36 +146,41 @@ void Graphics::printShop()
     DrawRectangleRec(optionsRec, GRAY);
 
     // print back button
-    printButton(buttons[ShopToGame]);
+    printButton((*buttons)[ShopToGame]);
 
     // print shop item buttons
-    printButton(buttons[ShopAddBall]);
-    printButton(buttons[ShopIncreaseBounce]);
-    printButton(buttons[ShopReduceFriction]);
-    printButton(buttons[ShopReduceGravity]);
-    printButton(buttons[ShopIncreaseJolt]);
+    printButton((*buttons)[ShopAddBall]);
+    printButton((*buttons)[ShopIncreaseBounce]);
+    printButton((*buttons)[ShopReduceFriction]);
+    printButton((*buttons)[ShopReduceGravity]);
+    printButton((*buttons)[ShopIncreaseJolt]);
+    printButton((*buttons)[ShopIncreaseGravity]);
 
     // print prices for items
-    int fontSize = 20;
+    int fontSize = 25;
     int spaceBelow = 3;
-    centerTextBelowRecPrint(buttons[ShopAddBall].rec,
+    centerTextBelowRecPrint((*buttons)[ShopAddBall].rec,
                             shop->getPriceS(ShopItem::AddBall),
                             fontSize,
                             spaceBelow);
-    centerTextBelowRecPrint(buttons[ShopIncreaseBounce].rec,
+    centerTextBelowRecPrint((*buttons)[ShopIncreaseBounce].rec,
                             shop->getPriceS(ShopItem::IncreaseBounce),
                             fontSize,
                             spaceBelow);
-    centerTextBelowRecPrint(buttons[ShopReduceFriction].rec,
+    centerTextBelowRecPrint((*buttons)[ShopReduceFriction].rec,
                             shop->getPriceS(ShopItem::ReduceFriction),
                             fontSize,
                             spaceBelow);
-    centerTextBelowRecPrint(buttons[ShopReduceGravity].rec,
+    centerTextBelowRecPrint((*buttons)[ShopReduceGravity].rec,
                             shop->getPriceS(ShopItem::ReduceGravity),
                             fontSize,
                             spaceBelow);
-    centerTextBelowRecPrint(buttons[ShopIncreaseJolt].rec,
+    centerTextBelowRecPrint((*buttons)[ShopIncreaseJolt].rec,
                             shop->getPriceS(ShopItem::JoltPercent),
+                            fontSize,
+                            spaceBelow);
+    centerTextBelowRecPrint((*buttons)[ShopIncreaseGravity].rec,
+                            shop->getPriceS(ShopItem::IncreaseGravity),
                             fontSize,
                             spaceBelow);
 }
@@ -170,7 +200,7 @@ void Graphics::printBalls()
 
 void Graphics::printScore()
 {
-    int fontSize = 30;
+    int fontSize = 50;
 
     string text = "Coins: ";
     text += std::to_string(player->getPoints());
@@ -186,12 +216,18 @@ void Graphics::printScore()
 void Graphics::printButton(Button button)
 {
     string text = button.label;
-    int fontsize = 20;
+    int fontsize = 30;
     int borderThickness = 5;
     Point textPoint = centerTextInRec(button.rec, text, fontsize);
 
-    DrawRectangleRec(button.rec, colors[ButtonBase]);
-    DrawRectangleLinesEx(button.rec, borderThickness, colors[ButtonBorder]);
+    Color curColor = colors[ButtonBase];
+    if (button.isPressed)
+    {
+        curColor = darkenColor(curColor, .6);
+    }
+
+    DrawRectangleRec(button.rec, curColor);
+    DrawRectangleLinesEx(button.rec, borderThickness, curColor);
 
     DrawText(text.c_str(), textPoint.x, textPoint.y, fontsize, colors[ButtonText]);
 }
@@ -220,4 +256,14 @@ void Graphics::centerTextBelowRecPrint(Rectangle &rec, string text, int fontSize
     p.y = rec.y + rec.height + spacingBelow;
 
     DrawTextEx(font, text.c_str(), {p.x, p.y}, fontSize, spacing, colors[ButtonText]);
+}
+
+Color Graphics::darkenColor(Color c, float factor)
+{
+    Color result;
+    result.a = c.a;
+    result.r = c.r * factor;
+    result.g = c.g * factor;
+    result.b = c.b * factor;
+    return result;
 }

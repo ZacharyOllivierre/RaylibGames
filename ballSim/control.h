@@ -15,17 +15,17 @@ private:
     Shop *shop;
     GraphicsData *graphicsData;
 
-    vector<Button> buttons;
+    vector<Button> *buttons;
 
     void controlsForMain();
     void controlsForGame();
     void controlsForShop();
 
-    void buttonsForGame(Vector2 &mousePos, bool clicked);
-    void buttonsForShop(Vector2 &mousePos, bool clicked);
+    void buttonsForGame(Vector2 &mousePos);
+    void buttonsForShop(Vector2 &mousePos);
 
 public:
-    Control(ProgramState *ps, BallManager *bm, GraphicsData *gd, Player *p, Shop *s, vector<Button> b);
+    Control(ProgramState *ps, BallManager *bm, GraphicsData *gd, Player *p, Shop *s, vector<Button> *b);
 
     void controlsForState(State s);
 };

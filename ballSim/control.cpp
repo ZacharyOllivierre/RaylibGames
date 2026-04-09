@@ -1,7 +1,7 @@
 #include "control.h"
 #include <iostream>
 
-Control::Control(ProgramState *ps, BallManager *bm, GraphicsData *gd, Player *p, Shop *s, vector<Button> b)
+Control::Control(ProgramState *ps, BallManager *bm, GraphicsData *gd, Player *p, Shop *s, vector<Button> *b)
 {
     programState = ps;
     ballManager = bm;
@@ -29,7 +29,7 @@ void Control::controlsForState(State s)
 
 void Control::controlsForMain()
 {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    if (IsKeyPressed(KEY_SPACE))
     {
         programState->state = State::Game;
     }
@@ -38,15 +38,6 @@ void Control::controlsForMain()
 void Control::controlsForGame()
 {
     Vector2 mousePos = GetMousePosition();
-    bool clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
-
-    // Rectangle simRec = graphicsData->gameStateRecs[GraphicsData::SimRec];
-
-    // // click in sim
-    // if (clicked && CheckCollisionPointRec(mousePos, simRec))
-    // {
-    //     ballManager->addBallCenter();
-    // }
 
     // spacebar
     if (IsKeyPressed(KEY_SPACE))
@@ -55,128 +46,149 @@ void Control::controlsForGame()
         programState->paused == true ? programState->paused = false : programState->paused = true;
     }
 
-    // buttons
-    buttonsForGame(mousePos, clicked);
+    buttonsForGame(mousePos);
 }
 
 void Control::controlsForShop()
 {
     Vector2 mousePos = GetMousePosition();
-    bool clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 
-    buttonsForShop(mousePos, clicked);
+    buttonsForShop(mousePos);
 }
 
-void Control::buttonsForGame(Vector2 &mousePos, bool clicked)
+void Control::buttonsForGame(Vector2 &mousePos)
 {
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[GameToMainMenu].rec))
+    bool down = IsMouseButtonDown(MOUSE_LEFT_BUTTON);
+    bool clicked = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[GameToMainMenu].rec))
     {
         programState->state = State::Main;
-        buttons[GameToMainMenu].isPressed = true;
+        (*buttons)[GameToMainMenu].isPressed = true;
     }
     else
     {
-        buttons[GameToMainMenu].isPressed = false;
+        (*buttons)[GameToMainMenu].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[GameToShop].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[GameToShop].rec))
     {
         programState->state = State::Shop;
-        buttons[GameToShop].isPressed = true;
+        (*buttons)[GameToShop].isPressed = true;
     }
     else
     {
-        buttons[GameToShop].isPressed = false;
+        (*buttons)[GameToShop].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[GameJoltBalls].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[GameJoltBalls].rec))
     {
-        int joltCost = 20;
-        ballManager->joltBalls();
-        player->subtractPoints(joltCost);
+        if (clicked)
+        {
+            int joltCost = 15;
+            ballManager->joltBalls();
+            player->subtractPoints(joltCost);
+        }
 
-        buttons[GameJoltBalls].isPressed = true;
+        (*buttons)[GameJoltBalls].isPressed = true;
     }
     else
     {
-        buttons[GameJoltBalls].isPressed = false;
+        (*buttons)[GameJoltBalls].isPressed = false;
     }
 }
 
-void Control::buttonsForShop(Vector2 &mousePos, bool clicked)
+// this function is a sin please repent - fix
+void Control::buttonsForShop(Vector2 &mousePos)
 {
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopToGame].rec))
+    bool down = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+    bool clicked = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopToGame].rec))
     {
         programState->state = State::Game;
-        buttons[ShopToGame].isPressed = true;
+        (*buttons)[ShopToGame].isPressed = true;
     }
     else
     {
-        buttons[ShopToGame].isPressed = false;
+        (*buttons)[ShopToGame].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopAddBall].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopAddBall].rec))
     {
-        if (shop->purchaseItem(ShopItem::AddBall))
+        if (clicked && shop->purchaseItem(ShopItem::AddBall))
         {
             ballManager->addBallCenter();
-            buttons[ShopAddBall].isPressed = true;
         }
+        (*buttons)[ShopAddBall].isPressed = true;
     }
     else
     {
-        buttons[ShopAddBall].isPressed = false;
+        (*buttons)[ShopAddBall].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopIncreaseBounce].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopIncreaseBounce].rec))
     {
-        if (shop->purchaseItem(ShopItem::IncreaseBounce))
+        if (clicked && shop->purchaseItem(ShopItem::IncreaseBounce))
         {
             ballManager->bounceCoefficient += 0.01;
-            buttons[ShopIncreaseBounce].isPressed = true;
         }
+        (*buttons)[ShopIncreaseBounce].isPressed = true;
     }
     else
     {
-        buttons[ShopIncreaseBounce].isPressed = false;
+        (*buttons)[ShopIncreaseBounce].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopReduceFriction].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopReduceFriction].rec))
     {
-        if (shop->purchaseItem(ShopItem::ReduceFriction))
+        if (clicked && shop->purchaseItem(ShopItem::ReduceFriction))
         {
             ballManager->friction += 0.01;
-            buttons[ShopReduceFriction].isPressed = true;
         }
+        (*buttons)[ShopReduceFriction].isPressed = true;
     }
     else
     {
-        buttons[ShopReduceFriction].isPressed = false;
+        (*buttons)[ShopReduceFriction].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopReduceGravity].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopReduceGravity].rec))
     {
-        if (shop->purchaseItem(ShopItem::ReduceGravity))
+        if (clicked && shop->purchaseItem(ShopItem::ReduceGravity))
         {
             ballManager->gravity -= 0.1;
-            buttons[ShopReduceGravity].isPressed = true;
         }
+        (*buttons)[ShopReduceGravity].isPressed = true;
     }
     else
     {
-        buttons[ShopReduceGravity].isPressed = false;
+        (*buttons)[ShopReduceGravity].isPressed = false;
     }
 
-    if (clicked && CheckCollisionPointRec(mousePos, buttons[ShopIncreaseJolt].rec))
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopIncreaseJolt].rec))
     {
         if (shop->purchaseItem(ShopItem::JoltPercent))
         {
             ballManager->joltPercent += 0.05;
-            buttons[ShopIncreaseJolt].isPressed = true;
         }
+        (*buttons)[ShopIncreaseJolt].isPressed = true;
     }
     else
     {
-        buttons[ShopIncreaseJolt].isPressed = false;
+        (*buttons)[ShopIncreaseJolt].isPressed = false;
+    }
+
+    if (down && CheckCollisionPointRec(mousePos, (*buttons)[ShopIncreaseGravity].rec))
+    {
+        if (shop->purchaseItem(ShopItem::IncreaseGravity))
+        {
+            ballManager->gravity += 0.2;
+        }
+        (*buttons)[ShopIncreaseGravity].isPressed = true;
+    }
+    else
+    {
+        (*buttons)[ShopIncreaseGravity].isPressed = false;
     }
 }

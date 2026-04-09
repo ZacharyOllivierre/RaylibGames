@@ -138,31 +138,35 @@ void BuildRecs::buildButtonRecs()
                           shopOpRec->y + shopOpRec->height * .90f,
                           shopOpRec->width * .20f,
                           shopOpRec->height * .10f});
-    // Shop add ball
+
     int shopItemHorSpace = 40;
     int shopItemVirSpace = 40;
-    buttonRecs.push_back({shopOpRec->x,
-                          shopOpRec->y,
-                          shopOpRec->width * .20f,
-                          shopOpRec->height * .20f});
-    // shop increase bounce
-    buttonRecs.push_back({buttonRecs[4].x + buttonRecs[4].width + shopItemHorSpace,
-                          buttonRecs[4].y,
-                          buttonRecs[4].width,
-                          buttonRecs[4].height});
-    // shop reduce friction
-    buttonRecs.push_back({buttonRecs[4].x,
-                          buttonRecs[4].y + buttonRecs[4].height + shopItemVirSpace,
-                          buttonRecs[4].width,
-                          buttonRecs[4].height});
-    // shop reduce gravity
-    buttonRecs.push_back({buttonRecs[5].x,
-                          buttonRecs[6].y,
-                          buttonRecs[4].width,
-                          buttonRecs[4].height});
-    // shop increase jolt
-    buttonRecs.push_back({buttonRecs[5].x + buttonRecs[5].width + shopItemHorSpace,
-                          buttonRecs[4].y,
-                          buttonRecs[4].width,
-                          buttonRecs[4].height});
+    int numCols = 3;
+
+    float itemWidth = (shopOpRec->width - (numCols - 1) * shopItemHorSpace) / (float)numCols;
+    float itemHeight = shopOpRec->height * 0.25f;
+
+    float startX = shopOpRec->x + (shopOpRec->width - (numCols * itemWidth + (numCols - 1) * shopItemHorSpace)) / 2;
+    float startY = shopOpRec->y + shopItemVirSpace;
+
+    for (int col = 0; col < numCols; col++)
+    {
+        Rectangle rec = {
+            startX + col * (itemWidth + shopItemHorSpace),
+            startY,
+            itemWidth,
+            itemHeight};
+        buttonRecs.push_back(rec);
+    }
+
+    float row2Y = startY + itemHeight + shopItemVirSpace;
+    for (int col = 0; col < numCols; col++)
+    {
+        Rectangle rec = {
+            startX + col * (itemWidth + shopItemHorSpace),
+            row2Y,
+            itemWidth,
+            itemHeight};
+        buttonRecs.push_back(rec);
+    }
 }

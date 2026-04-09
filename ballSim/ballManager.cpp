@@ -12,11 +12,14 @@ BallManager::BallManager(Rectangle ballRec, const vector<Rectangle> &walls, Play
     int screenSizeDivisior = 7;
     maxVelocity = {ballRec.width / screenSizeDivisior, ballRec.height / screenSizeDivisior};
 
-    bounceCoefficient = 0.9;
-    friction = 0.9;
-    gravity = 1;
+    // set shop stats
+    bounceCoefficient = 0.85;
+    friction = 0.85;
+    gravity = 2;
+    joltPercent = 0.1;
 
-    joltPercent = 0.3;
+    // add starting ball
+    addBallCenter();
 }
 
 BallManager::~BallManager()
@@ -29,7 +32,8 @@ BallManager::~BallManager()
 
 void BallManager::addBallCenter()
 {
-    Velocity startingVelocity = getRandomVelocity(maxVelocity);
+    Velocity startingVelocity = getRandomVelocity({maxVelocity.xVel * joltPercent,
+                                                   maxVelocity.yVel * joltPercent});
     Point centerPoint = getCenter(ballRec);
 
     Ball *newBall = new Ball(

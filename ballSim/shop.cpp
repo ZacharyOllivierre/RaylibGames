@@ -7,7 +7,7 @@ Shop::Shop(Player *p)
     int itemCount = static_cast<int>(ShopItem::COUNT);
     for (int i = 0; i < itemCount; i++)
     {
-        purchaseCounts.push_back(0);
+        purchaseCounts.push_back(1);
         prices.push_back(getStarterPrice(static_cast<ShopItem>(i)));
     }
 }
@@ -44,6 +44,8 @@ int Shop::getStarterPrice(ShopItem item)
         return 20;
     case ShopItem::JoltPercent:
         return 15;
+    case ShopItem::IncreaseGravity:
+        return 5;
     case ShopItem::COUNT:
         break;
     }

@@ -15,6 +15,7 @@ enum ButtonType
     ShopReduceFriction,
     ShopReduceGravity,
     ShopIncreaseJolt,
+    ShopIncreaseGravity,
 };
 
 struct Button

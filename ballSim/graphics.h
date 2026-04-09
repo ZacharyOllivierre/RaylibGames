@@ -34,10 +34,12 @@ private:
     Player *player;
     Shop *shop;
 
-    vector<Button> buttons;
+    vector<Button> *buttons;
 
     vector<Rectangle> ballWalls;
     vector<Color> colors;
+
+    RenderTexture2D canvas;
 
     void printMainMenu();
     void printGame();
@@ -51,8 +53,11 @@ private:
     Point centerTextInRec(Rectangle &rec, string text, int fontSize);
     void centerTextBelowRecPrint(Rectangle &rec, string text, int fontSize, int spacingBelow);
 
+    Color darkenColor(Color c, float factor);
+
 public:
-    Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> buttons);
+    Graphics(GraphicsData data, BallManager *ballManager, Player *player, Shop *shop, vector<Button> *buttons);
+    ~Graphics();
 
     void printState(State state);
 

@@ -14,7 +14,7 @@ int main()
     const int screenWidth = 1200;
     const int screenHeight = 800;
 
-    InitWindow(screenWidth, screenHeight, "ball sim");
+    InitWindow(screenWidth, screenHeight, "Bounce");
     SetTargetFPS(60);
 
     // Init data structs
@@ -33,8 +33,8 @@ int main()
     Player player;
     Shop shop(&player);
     BallManager ballManager(data.gameStateRecs[GraphicsData::SimRec], data.wallRecs, &player);
-    Graphics graphics(data, &ballManager, &player, &shop, buttons);
-    Control control(&programState, &ballManager, &data, &player, &shop, buttons);
+    Graphics graphics(data, &ballManager, &player, &shop, &buttons);
+    Control control(&programState, &ballManager, &data, &player, &shop, &buttons);
 
     while (!WindowShouldClose())
     {
@@ -58,47 +58,32 @@ void initButtons(vector<Button> &buttons, BuildRecs *br)
 
     // Game menu to main menu button
     buttons.push_back({buttonRecs[GameToMainMenu],
-                       GameToMainMenu,
-                       "Go to Main Menu",
-                       false});
+                       GameToMainMenu, "Go to Main Menu", false});
     // Game menu to shop
     buttons.push_back({buttonRecs[GameToShop],
-                       GameToShop,
-                       "Go to Shop",
-                       false});
+                       GameToShop, "Go to Shop", false});
     // Game jolt balls
     buttons.push_back({buttonRecs[GameJoltBalls],
-                       GameJoltBalls,
-                       "Jolt Balls",
-                       false});
+                       GameJoltBalls, "Jolt Balls", false});
     // Shop to game
     buttons.push_back({buttonRecs[ShopToGame],
-                       ShopToGame,
-                       "Go to Game",
-                       false});
+                       ShopToGame, "Go to Game", false});
     // Shop Item add ball
     buttons.push_back({buttonRecs[ShopAddBall],
-                       ShopAddBall,
-                       "Buy Ball",
-                       false});
+                       ShopAddBall, "Buy Ball", false});
     // Shop item increase bounce
     buttons.push_back({buttonRecs[ShopIncreaseBounce],
-                       ShopIncreaseBounce,
-                       "Upgrade Bounce",
-                       false});
+                       ShopIncreaseBounce, "Upgrade Bounce", false});
     // Shop item reduce friction
     buttons.push_back({buttonRecs[ShopReduceFriction],
-                       ShopReduceFriction,
-                       "Reduce Friction",
-                       false});
+                       ShopReduceFriction, "Reduce Friction", false});
     // Shop item reduce gravity
     buttons.push_back({buttonRecs[ShopReduceGravity],
-                       ShopReduceGravity,
-                       "Reduce Gravity",
-                       false});
+                       ShopReduceGravity, "Reduce Gravity", false});
     // Shop increase jolt
     buttons.push_back({buttonRecs[ShopIncreaseJolt],
-                       ShopIncreaseJolt,
-                       "Upgrade Jolt",
-                       false});
+                       ShopIncreaseJolt, "Upgrade Jolt", false});
+    // Shop increase gravity
+    buttons.push_back({buttonRecs[ShopIncreaseGravity],
+                       ShopIncreaseGravity, "Increase Gravity", false});
 }
