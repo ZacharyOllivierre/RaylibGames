@@ -13,8 +13,9 @@ Each project is self contained and explores different mechanics, rendering techn
   - Its Pong!
   - But with shaders
 
-### BallSim (Work in progress)
-  -
+### Bounce 
+  - Basic ball simulation game
+
 ### Tetris (Work in progress)
   - Its Tetris!
 
