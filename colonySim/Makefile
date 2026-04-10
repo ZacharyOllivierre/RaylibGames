@@ -1,4 +1,4 @@
-SOURCES = main.cpp
+SOURCES = main.cpp tile.cpp tileManager.cpp graphics.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXEC    = ex.exe
 
