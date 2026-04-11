@@ -5,9 +5,6 @@
 #include "graphics.h"
 #include "entityManager.h"
 
-#include <iostream>
-using namespace std;
-
 using std::vector;
 
 int main()
@@ -28,23 +25,33 @@ int main()
 
     SetTargetFPS(60);
 
-    entityManager.createEntity({100, 100}, "Entity1", 500, 5);
-    entityManager.createEntity({333, 300}, "Entity2", 500, 1.5);
+    int numEntities = 20;
+    for (int i = 0; i < numEntities; i++)
+    {
+        entityManager.createEntity(randomPointInRec(&simRec), "Entity" + std::to_string(i), 100 + i, GetRandomValue(0, 20));
+    }
 
     while (!WindowShouldClose())
     {
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            Vector2 clickPos = GetMousePosition();
-            entityManager.getRandomEntity()->moveToPos(clickPos);
+            Entity *entity = entityManager.getRandomEntity();
+
+            if (entity != nullptr)
+            {
+                Vector2 clickPos = GetMousePosition();
+                entity->moveToPos(clickPos);
+            }
         }
 
-        // if (IsKeyPressed(KEY_BACKSPACE))
-        // {
-        //     cout << "Entity count before kill " << entityManager.entityList.size() << endl;
-        //     entityManager.killEntity(entityManager.getRandomEntity());
-        //     cout << "Entity count after kill " << entityManager.entityList.size() << endl;
-        // }
+        if (IsKeyPressed(KEY_BACKSPACE))
+        {
+            Entity *entity = entityManager.getRandomEntity();
+            if (entity != nullptr)
+            {
+                entityManager.killEntity(entity);
+            }
+        }
 
         entityManager.updateEntities();
         graphics.printScreen();
