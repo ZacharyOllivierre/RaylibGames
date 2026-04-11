@@ -1,11 +1,12 @@
 #include "raylib.h"
-#include <cstdlib>
-#include <ctime>
 #include <vector>
 
 #include "tileManager.h"
 #include "graphics.h"
 #include "entityManager.h"
+
+#include <iostream>
+using namespace std;
 
 using std::vector;
 
@@ -27,30 +28,26 @@ int main()
 
     SetTargetFPS(60);
 
-    srand(time(nullptr));
-
-    entityManager.createEntity();
+    entityManager.createEntity({100, 100}, "Entity1", 500, 5);
+    entityManager.createEntity({333, 300}, "Entity2", 500, 1.5);
 
     while (!WindowShouldClose())
     {
-        Vector2 clickPos;
-        bool clicked = false;
-
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
-            clickPos = GetMousePosition();
-            clicked = true;
-        }
-        if (clicked)
-        {
-            entityManager.entityList[0]->moveToPos(clickPos);
+            Vector2 clickPos = GetMousePosition();
+            entityManager.getRandomEntity()->moveToPos(clickPos);
         }
 
-        if (rand() % 5 == 0)
-        {
-            entityManager.updateEntities();
-            graphics.printScreen();
-        }
+        // if (IsKeyPressed(KEY_BACKSPACE))
+        // {
+        //     cout << "Entity count before kill " << entityManager.entityList.size() << endl;
+        //     entityManager.killEntity(entityManager.getRandomEntity());
+        //     cout << "Entity count after kill " << entityManager.entityList.size() << endl;
+        // }
+
+        entityManager.updateEntities();
+        graphics.printScreen();
     }
 
     CloseWindow();

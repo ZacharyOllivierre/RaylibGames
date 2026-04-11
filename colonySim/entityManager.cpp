@@ -30,12 +30,27 @@ void EntityManager::updateEntities()
     deleteListOfEntities(indexesToDelete);
 }
 
-void EntityManager::createEntity()
+void EntityManager::createEntity(Vector2 pos, string name, float health, float speed)
 {
-    Vector2 pos = getCenterOfRec(&simRec);
-    Entity *newEntity = new Entity(pos, "Test Entity", 100, 3, true);
+    Entity *newEntity = new Entity(pos, name, health, speed, &simRec, true);
 
     entityList.push_back(newEntity);
+}
+
+Entity *EntityManager::getRandomEntity()
+{
+    if (entityList.empty())
+    {
+        return nullptr;
+    }
+
+    int randInx = GetRandomValue(0, entityList.size() - 1);
+    return entityList[randInx];
+}
+
+void EntityManager::killEntity(Entity *entity)
+{
+    entity->takeDamage(entity->getHealth());
 }
 
 // private
