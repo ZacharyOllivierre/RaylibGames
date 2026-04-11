@@ -1,8 +1,9 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData *gd, TileManager *tm, Vector2 ts)
+Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Vector2 ts)
 {
     tileManager = tm;
+    entityManager = em;
     data = gd;
     tileSize = ts;
 
@@ -11,13 +12,18 @@ Graphics::Graphics(GraphicsData *gd, TileManager *tm, Vector2 ts)
 
     // Init textures
     simTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
+    entityTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
 
     grassTexture = LoadTexture("grass.png");
+    baseEntityTexture = LoadTexture("baseEntity.png");
 }
 
 Graphics::~Graphics()
 {
     UnloadRenderTexture(simTexture);
+    UnloadRenderTexture(entityTexture);
+
+    UnloadTexture(grassTexture);
 }
 
 void Graphics::printScreen()
@@ -28,14 +34,20 @@ void Graphics::printScreen()
         createSimTexture();
     }
 
+    // Create current entity texture
+    createEntityTexture();
+
     BeginDrawing();
 
     ClearBackground(BLACK);
 
     DrawTexturePro(simTexture.texture,
-                   {0, 0,
-                    (float)simTexture.texture.width,
-                    (float)simTexture.texture.height},
+                   {0, 0, (float)simTexture.texture.width, -(float)simTexture.texture.height},
+                   data->simRec,
+                   {0, 0}, 0, WHITE);
+
+    DrawTexturePro(entityTexture.texture,
+                   {0, 0, (float)entityTexture.texture.width, -(float)entityTexture.texture.height},
                    data->simRec,
                    {0, 0}, 0, WHITE);
 
@@ -65,6 +77,19 @@ void Graphics::createSimTexture()
     EndTextureMode();
 }
 
+void Graphics::createEntityTexture()
+{
+    BeginTextureMode(entityTexture);
+
+    ClearBackground(BLANK);
+
+    for (Entity *entity : entityManager->entityList)
+    {
+        printEntity(entity);
+    }
+    EndTextureMode();
+}
+
 void Graphics::printTile(Tile *tile)
 {
     Vector2 *tilePos = tile->getPosition();
@@ -75,5 +100,17 @@ void Graphics::printTile(Tile *tile)
     DrawTexturePro(grassTexture,
                    {0, 0, (float)grassTexture.width, (float)grassTexture.height},
                    {(float)xPos, (float)yPos, tileSize.x, tileSize.y},
+                   {0, 0}, 0, WHITE);
+}
+
+void Graphics::printEntity(Entity *entity)
+{
+    Vector2 *entityPos = entity->getPosition();
+    // Entity pixel size 8x8
+    float entitySize = 8;
+
+    DrawTexturePro(baseEntityTexture,
+                   {0, 0, (float)baseEntityTexture.width, (float)baseEntityTexture.height},
+                   {entityPos->x, entityPos->y, entitySize, entitySize},
                    {0, 0}, 0, WHITE);
 }
