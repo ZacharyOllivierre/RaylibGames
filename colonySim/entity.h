@@ -4,15 +4,21 @@
 
 using std::string;
 
-class Entity
+struct BaseEntityData
 {
-protected:
     string name;
     float health;
     float speed;
     bool alive;
+};
+
+class Entity
+{
+protected:
+    BaseEntityData baseData;
 
     Rectangle *simRec;
+
     Vector2 position;
     Vector2 newPosition;
     bool moving;
@@ -23,14 +29,14 @@ public:
     bool insideStructure;
 
 public:
-    Entity(Vector2 position, string name, float health, float speed, Rectangle *simRec, bool alive);
+    Entity(Vector2 position, BaseEntityData baseData, Rectangle *simRec);
     ~Entity();
 
     void update();
     void moveToPos(Vector2 newPosition);
     void takeDamage(float damage);
 
-    inline bool getAlive() { return alive; }
-    inline float getHealth() { return health; }
+    inline bool getAlive() { return baseData.alive; }
+    inline float getHealth() { return baseData.health; }
     inline Vector2 *getPosition() { return &position; }
 };

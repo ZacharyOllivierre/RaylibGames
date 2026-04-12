@@ -30,9 +30,9 @@ void EntityManager::updateEntities()
     deleteListOfEntities(indexesToDelete);
 }
 
-void EntityManager::createEntity(Vector2 pos, string name, float health, float speed)
+void EntityManager::createEntity(Vector2 pos, BaseEntityData baseData)
 {
-    Entity *newEntity = new Entity(pos, name, health, speed, &simRec, true);
+    Entity *newEntity = new Entity(pos, baseData, &simRec);
 
     entityList.push_back(newEntity);
 }

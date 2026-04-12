@@ -14,8 +14,8 @@ Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Vector2
     simTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
     entityTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
 
-    grassTexture = LoadTexture("grass.png");
-    baseEntityTexture = LoadTexture("baseEntity.png");
+    grassTexture = LoadTexture("resources/grass.png");
+    baseEntityTexture = LoadTexture("resources/baseEntity.png");
 }
 
 Graphics::~Graphics()
@@ -85,7 +85,10 @@ void Graphics::createEntityTexture()
 
     for (Entity *entity : entityManager->entityList)
     {
-        printEntity(entity);
+        if (!entity->insideStructure)
+        {
+            printEntity(entity);
+        }
     }
     EndTextureMode();
 }

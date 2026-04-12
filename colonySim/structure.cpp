@@ -1,8 +1,9 @@
 #include "structure.h"
 
-Structure::Structure(Tile *tileLoc, const char *texturePath)
+Structure::Structure(Tile *tileLoc, Entity *owner, const char *texturePath)
 {
     this->tileLoc = tileLoc;
+    this->owner = owner;
     texture = LoadTexture(texturePath);
 }
 

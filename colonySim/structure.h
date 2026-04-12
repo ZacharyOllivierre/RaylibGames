@@ -9,12 +9,14 @@ class Structure
 {
 protected:
     Tile *tileLoc;
+    Entity *owner;
+
     Texture2D texture;
 
     vector<Entity *> entitiesInside;
 
 public:
-    Structure(Tile *tileLoc, const char *texturePath);
+    Structure(Tile *tileLoc, Entity *owner, const char *texturePath);
     virtual ~Structure();
 
     virtual void draw() const = 0;

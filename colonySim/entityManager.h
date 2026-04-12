@@ -18,7 +18,7 @@ public:
     EntityManager(Rectangle simRec);
 
     void updateEntities();
-    void createEntity(Vector2 pos, string name, float health, float speed);
+    void createEntity(Vector2 pos, BaseEntityData baseData);
 
     Entity *getRandomEntity();
     void killEntity(Entity *entity);

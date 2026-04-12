@@ -4,7 +4,7 @@
 class House : protected Structure
 {
 public:
-    House(Tile *tileLoc, const char *texturePath);
+    House(Tile *tileLoc, Entity *owner, const char *texturePath);
 
     void draw() const override;
 };

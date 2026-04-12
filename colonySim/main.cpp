@@ -28,7 +28,7 @@ int main()
     int numEntities = 20;
     for (int i = 0; i < numEntities; i++)
     {
-        entityManager.createEntity(randomPointInRec(&simRec), "Entity" + std::to_string(i), 100 + i, GetRandomValue(0, 20));
+        entityManager.createEntity(randomPointInRec(&simRec), {"Entity" + std::to_string(i), (float)100 + i, (float)GetRandomValue(0, 20), true});
     }
 
     while (!WindowShouldClose())

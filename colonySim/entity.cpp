@@ -1,14 +1,12 @@
 #include "entity.h"
 
-Entity::Entity(Vector2 position, string name, float health, float speed, Rectangle *simRec, bool alive)
+Entity::Entity(Vector2 position, BaseEntityData baseData, Rectangle *simRec)
 {
     this->position = position;
-    this->name = name;
-    this->health = health;
-    this->speed = speed;
+    this->baseData = baseData;
     this->simRec = simRec;
-    this->alive = alive;
-    alive = true;
+
+    insideStructure = false;
 }
 
 Entity::~Entity()
@@ -35,11 +33,11 @@ void Entity::moveToPos(Vector2 newPosition)
 
 void Entity::takeDamage(float damage)
 {
-    health -= damage;
+    baseData.health -= damage;
 
-    if (health <= 0)
+    if (baseData.health <= 0)
     {
-        alive = false;
+        baseData.alive = false;
     }
 }
 
@@ -61,9 +59,9 @@ void Entity::moveTowardsNewPos()
         If moving speed amount shoots over desired distance(n),
         move n amount instead*/
         float yDist = abs(newPosition.y - position.y);
-        float entitySpeedY = speed;
+        float entitySpeedY = baseData.speed;
 
-        if (yDist < speed)
+        if (yDist < baseData.speed)
         {
             entitySpeedY = yDist;
         }
@@ -83,7 +81,7 @@ void Entity::moveTowardsNewPos()
     if (position.x != newPosition.x)
     {
         float xDist = abs(newPosition.x - position.x);
-        float entitySpeedX = speed;
+        float entitySpeedX = baseData.speed;
 
         /*To prevent extra speed on diagonal movement half base speed
         in x if already moving in y
@@ -93,7 +91,7 @@ void Entity::moveTowardsNewPos()
             entitySpeedX /= 2;
         }
 
-        if (xDist < speed)
+        if (xDist < baseData.speed)
         {
             entitySpeedX = xDist;
         }
