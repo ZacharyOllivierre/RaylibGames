@@ -20,6 +20,9 @@ protected:
     void moveTowardsNewPos();
 
 public:
+    bool insideStructure;
+
+public:
     Entity(Vector2 position, string name, float health, float speed, Rectangle *simRec, bool alive);
     ~Entity();
 

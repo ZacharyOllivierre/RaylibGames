@@ -111,6 +111,6 @@ void Graphics::printEntity(Entity *entity)
 
     DrawTexturePro(baseEntityTexture,
                    {0, 0, (float)baseEntityTexture.width, (float)baseEntityTexture.height},
-                   {entityPos->x, entityPos->y, entitySize, entitySize},
+                   {entityPos->x, entityPos->y, entitySize * 2, entitySize * 2},
                    {0, 0}, 0, WHITE);
 }

@@ -12,7 +12,7 @@ int main()
     Rectangle screenRec = {0, 0, 1200, 800};
     InitWindow(screenRec.width, screenRec.height, "Colony Sim");
 
-    Rectangle simRec = {0, 0, screenRec.width, 560};
+    Rectangle simRec = {0, 0, screenRec.width, 608};
 
     GraphicsData gData = {screenRec, simRec};
 
