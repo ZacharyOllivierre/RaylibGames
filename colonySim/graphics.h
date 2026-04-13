@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "tileManager.h"
 #include "entityManager.h"
+#include "structureManager.h"
 
 struct GraphicsData
 {
@@ -14,11 +15,13 @@ class Graphics
 private:
     TileManager *tileManager;
     EntityManager *entityManager;
+    StructureManager *structManager;
 
     GraphicsData *data;
 
     RenderTexture2D simTexture;
     RenderTexture2D entityTexture;
+    RenderTexture2D structTexture;
 
     Texture2D grassTexture;
     Texture2D baseEntityTexture;
@@ -29,12 +32,13 @@ private:
 
     void createSimTexture();
     void createEntityTexture();
+    void createStructureTexture();
 
     void printTile(Tile *tile);
     void printEntity(Entity *entity);
 
 public:
-    Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Vector2 ts);
+    Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts);
     ~Graphics();
 
     void printScreen();

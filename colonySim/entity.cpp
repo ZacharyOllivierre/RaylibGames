@@ -5,8 +5,6 @@ Entity::Entity(Vector2 position, BaseEntityData baseData, Rectangle *simRec)
     this->position = position;
     this->baseData = baseData;
     this->simRec = simRec;
-
-    insideStructure = false;
 }
 
 Entity::~Entity()

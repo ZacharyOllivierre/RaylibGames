@@ -20,8 +20,6 @@ void Structure::enterStructure(Entity *e)
     }
 
     entitiesInside.push_back(e);
-
-    e->insideStructure = true;
 }
 
 void Structure::exitStructure(Entity *e)
@@ -32,6 +30,4 @@ void Structure::exitStructure(Entity *e)
     }
     // Erase entity from structure list
     entitiesInside.erase(std::remove(entitiesInside.begin(), entitiesInside.end(), e), entitiesInside.end());
-
-    e->insideStructure = false;
 }

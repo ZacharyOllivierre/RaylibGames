@@ -1,10 +1,10 @@
 #pragma once
 #include "structure.h"
 
-class House : protected Structure
+class House : public Structure
 {
 public:
-    House(Tile *tileLoc, Entity *owner, const char *texturePath);
+    House(Tile *tileLoc, Entity *owner);
 
-    void draw() const override;
+    void draw(Vector2 tileSize) const override;
 };

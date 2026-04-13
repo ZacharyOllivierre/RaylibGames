@@ -4,6 +4,7 @@
 #include "tileManager.h"
 #include "graphics.h"
 #include "entityManager.h"
+#include "structureManager.h"
 
 using std::vector;
 
@@ -21,7 +22,8 @@ int main()
 
     TileManager tileManager(tileAmount);
     EntityManager entityManager(simRec);
-    Graphics graphics(&gData, &tileManager, &entityManager, tileSize);
+    StructureManager structureManager;
+    Graphics graphics(&gData, &tileManager, &entityManager, &structureManager, tileSize);
 
     SetTargetFPS(60);
 
@@ -50,6 +52,16 @@ int main()
             if (entity != nullptr)
             {
                 entityManager.killEntity(entity);
+            }
+        }
+
+        if (IsKeyPressed(KEY_H))
+        {
+            Entity *entity = entityManager.getRandomEntity();
+            Tile *tile = tileManager.getRandomTile();
+            if (entity && tile)
+            {
+                structureManager.createStructure(StructureType::HouseType, tile, entity);
             }
         }
 

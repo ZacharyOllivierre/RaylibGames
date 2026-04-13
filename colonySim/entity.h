@@ -26,9 +26,6 @@ protected:
     void moveTowardsNewPos();
 
 public:
-    bool insideStructure;
-
-public:
     Entity(Vector2 position, BaseEntityData baseData, Rectangle *simRec);
     ~Entity();
 

@@ -19,4 +19,6 @@ public:
 
     // Returns the tiles in 1d vector
     vector<Tile *> getTiles();
+
+    Tile *getRandomTile();
 };

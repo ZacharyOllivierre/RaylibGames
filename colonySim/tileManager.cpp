@@ -21,6 +21,18 @@ vector<Tile *> TileManager::getTiles()
     return r;
 }
 
+Tile *TileManager::getRandomTile()
+{
+    if (tileSet.empty())
+    {
+        return nullptr;
+    }
+    int y = GetRandomValue(0, tileSet.size() - 1);
+    int x = GetRandomValue(0, tileSet[y].size() - 1);
+
+    return tileSet[y][x];
+}
+
 void TileManager::initTileSet()
 {
     tileSet.resize(tileAmount.y);
@@ -30,7 +42,7 @@ void TileManager::initTileSet()
         for (int x = 0; x < tileAmount.x; x++)
         {
             Vector2 pos = {(float)x, (float)y};
-            Tile *newTile = new Tile(GREEN, pos);
+            Tile *newTile = new Tile(pos);
 
             tileSet[y].push_back(newTile);
         }

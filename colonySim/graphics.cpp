@@ -1,9 +1,10 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Vector2 ts)
+Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts)
 {
     tileManager = tm;
     entityManager = em;
+    structManager = sm;
     data = gd;
     tileSize = ts;
 
@@ -13,6 +14,7 @@ Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Vector2
     // Init textures
     simTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
     entityTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
+    structTexture = LoadRenderTexture(data->simRec.width, data->simRec.height);
 
     grassTexture = LoadTexture("resources/grass.png");
     baseEntityTexture = LoadTexture("resources/baseEntity.png");
@@ -22,8 +24,10 @@ Graphics::~Graphics()
 {
     UnloadRenderTexture(simTexture);
     UnloadRenderTexture(entityTexture);
+    UnloadRenderTexture(structTexture);
 
     UnloadTexture(grassTexture);
+    UnloadTexture(baseEntityTexture);
 }
 
 void Graphics::printScreen()
@@ -37,6 +41,9 @@ void Graphics::printScreen()
     // Create current entity texture
     createEntityTexture();
 
+    // Create structure texture
+    createStructureTexture();
+
     BeginDrawing();
 
     ClearBackground(BLACK);
@@ -48,6 +55,11 @@ void Graphics::printScreen()
 
     DrawTexturePro(entityTexture.texture,
                    {0, 0, (float)entityTexture.texture.width, -(float)entityTexture.texture.height},
+                   data->simRec,
+                   {0, 0}, 0, WHITE);
+
+    DrawTexturePro(structTexture.texture,
+                   {0, 0, (float)structTexture.texture.width, -(float)structTexture.texture.height},
                    data->simRec,
                    {0, 0}, 0, WHITE);
 
@@ -85,10 +97,20 @@ void Graphics::createEntityTexture()
 
     for (Entity *entity : entityManager->entityList)
     {
-        if (!entity->insideStructure)
-        {
-            printEntity(entity);
-        }
+        printEntity(entity);
+    }
+    EndTextureMode();
+}
+
+void Graphics::createStructureTexture()
+{
+    BeginTextureMode(structTexture);
+
+    ClearBackground(BLANK);
+
+    for (Structure *s : structManager->structureList)
+    {
+        s->draw(tileSize);
     }
     EndTextureMode();
 }
@@ -114,6 +136,6 @@ void Graphics::printEntity(Entity *entity)
 
     DrawTexturePro(baseEntityTexture,
                    {0, 0, (float)baseEntityTexture.width, (float)baseEntityTexture.height},
-                   {entityPos->x, entityPos->y, entitySize * 2, entitySize * 2},
+                   {entityPos->x, entityPos->y, entitySize, entitySize},
                    {0, 0}, 0, WHITE);
 }

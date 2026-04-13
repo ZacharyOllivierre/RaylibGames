@@ -19,7 +19,7 @@ public:
     Structure(Tile *tileLoc, Entity *owner, const char *texturePath);
     virtual ~Structure();
 
-    virtual void draw() const = 0;
+    virtual void draw(Vector2 tileSize) const = 0;
 
     void enterStructure(Entity *e);
     void exitStructure(Entity *e);
