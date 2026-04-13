@@ -17,6 +17,8 @@ private:
     EntityManager *entityManager;
     StructureManager *structManager;
 
+    Camera2D *camera;
+
     GraphicsData *data;
 
     RenderTexture2D simTexture;
@@ -38,7 +40,7 @@ private:
     void printEntity(Entity *entity);
 
 public:
-    Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts);
+    Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts, Camera2D *c);
     ~Graphics();
 
     void printScreen();

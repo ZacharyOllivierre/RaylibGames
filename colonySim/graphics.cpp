@@ -1,12 +1,13 @@
 #include "graphics.h"
 
-Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts)
+Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, StructureManager *sm, Vector2 ts, Camera2D *c)
 {
     tileManager = tm;
     entityManager = em;
     structManager = sm;
     data = gd;
     tileSize = ts;
+    camera = c;
 
     // Start tile buffer with all tiles for init print
     tileBuffer = tileManager->getTiles();
@@ -18,6 +19,12 @@ Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Structu
 
     grassTexture = LoadTexture("resources/grass.png");
     baseEntityTexture = LoadTexture("resources/baseEntity.png");
+
+    // Init camera
+    camera->target = {0, 0};
+    camera->offset = (Vector2){data->screenRec.width / 2.0f, data->screenRec.height / 2.0f};
+    camera->rotation = 0;
+    camera->zoom = 1.0;
 }
 
 Graphics::~Graphics()
@@ -45,8 +52,9 @@ void Graphics::printScreen()
     createStructureTexture();
 
     BeginDrawing();
-
     ClearBackground(BLACK);
+
+    BeginMode2D(*camera);
 
     DrawTexturePro(simTexture.texture,
                    {0, 0, (float)simTexture.texture.width, -(float)simTexture.texture.height},
@@ -62,8 +70,10 @@ void Graphics::printScreen()
                    {0, 0, (float)structTexture.texture.width, -(float)structTexture.texture.height},
                    data->simRec,
                    {0, 0}, 0, WHITE);
+    EndMode2D();
 
     DrawFPS(10, 10);
+
     EndDrawing();
 }
 

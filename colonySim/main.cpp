@@ -20,10 +20,11 @@ int main()
     Vector2 tileSize = {16, 16};
     Vector2 tileAmount = {simRec.width / tileSize.x, simRec.height / tileSize.y};
 
+    Camera2D camera;
     TileManager tileManager(tileAmount);
     EntityManager entityManager(simRec);
     StructureManager structureManager;
-    Graphics graphics(&gData, &tileManager, &entityManager, &structureManager, tileSize);
+    Graphics graphics(&gData, &tileManager, &entityManager, &structureManager, tileSize, &camera);
 
     SetTargetFPS(60);
 
@@ -35,6 +36,9 @@ int main()
 
     while (!WindowShouldClose())
     {
+        camera.target = GetMousePosition();
+        camera.zoom = expf(logf(camera.zoom) + ((float)GetMouseWheelMove() * 0.1f));
+
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
             Entity *entity = entityManager.getRandomEntity();
