@@ -21,7 +21,7 @@ Graphics::Graphics(GraphicsData *gd, TileManager *tm, EntityManager *em, Structu
     baseEntityTexture = LoadTexture("resources/baseEntity.png");
 
     // Init camera
-    camera->target = {0, 0};
+    camera->target = (Vector2){data->screenRec.width / 2.0f, data->screenRec.height / 2.0f};
     camera->offset = (Vector2){data->screenRec.width / 2.0f, data->screenRec.height / 2.0f};
     camera->rotation = 0;
     camera->zoom = 1.0;

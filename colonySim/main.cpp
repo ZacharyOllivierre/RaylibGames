@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include "entityManager.h"
 #include "structureManager.h"
+#include "control.h"
 
 using std::vector;
 
@@ -25,6 +26,7 @@ int main()
     EntityManager entityManager(simRec);
     StructureManager structureManager;
     Graphics graphics(&gData, &tileManager, &entityManager, &structureManager, tileSize, &camera);
+    Control control(&camera, &entityManager, &structureManager, &tileManager);
 
     SetTargetFPS(60);
 
@@ -36,39 +38,10 @@ int main()
 
     while (!WindowShouldClose())
     {
-        camera.target = GetMousePosition();
-        camera.zoom = expf(logf(camera.zoom) + ((float)GetMouseWheelMove() * 0.1f));
+        control.cameraControls();
+        control.debugKeyboardControls();
 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
-        {
-            Entity *entity = entityManager.getRandomEntity();
-
-            if (entity != nullptr)
-            {
-                Vector2 clickPos = GetMousePosition();
-                entity->moveToPos(clickPos);
-            }
-        }
-
-        if (IsKeyPressed(KEY_BACKSPACE))
-        {
-            Entity *entity = entityManager.getRandomEntity();
-            if (entity != nullptr)
-            {
-                entityManager.killEntity(entity);
-            }
-        }
-
-        if (IsKeyPressed(KEY_H))
-        {
-            Entity *entity = entityManager.getRandomEntity();
-            Tile *tile = tileManager.getRandomTile();
-            if (entity && tile)
-            {
-                structureManager.createStructure(StructureType::HouseType, tile, entity);
-            }
-        }
-
+        // Update
         entityManager.updateEntities();
         graphics.printScreen();
     }
