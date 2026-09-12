@@ -46,3 +46,22 @@ struct ParticleData
     Vector2 position;
     Vector2 velocity;
 };
+
+// Colors for type / attraction grid
+// only works because type id is sequential
+enum class SimColors
+{
+    Red,
+    Green,
+    Blue,
+    Purple,
+    Yellow,
+    Orange,
+    Pink,
+    White,
+    Lime,
+    Skyblue,
+    Violet,
+    Brown,
+    NUM
+};

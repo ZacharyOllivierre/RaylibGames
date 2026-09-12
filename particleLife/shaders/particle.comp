@@ -1,0 +1,205 @@
+#version 450
+
+struct Particle
+{
+    int typeId;
+    float size;
+
+    float positionX;
+    float positionY;
+
+    float velocityX;
+    float velocityY;
+};
+
+struct SimParameters
+{
+    float innateRepulsionArea;
+    float innateRepulsion;
+    float maxAttractionArea;
+    float maxAttraction;
+    float maxSpeed;
+    float damping;
+
+    float width;
+    float height;
+
+    uint numTypes;
+
+    float attraction[256];
+};
+
+layout(std430, binding = 0) buffer ParticleBuffer
+{
+    Particle particles[];
+};
+
+layout(std430, binding = 1) readonly buffer SimulationBuffer
+{
+    SimParameters simulation;
+};
+
+layout(push_constant) uniform PushConstants
+{
+    uint particleCount;
+};
+
+layout(local_size_x = 64) in;
+
+float magnitude(vec2 value)
+{
+    return sqrt(dot(value, value));
+}
+
+vec2 normalizeVector(vec2 value)
+{
+    float length = magnitude(value);
+
+    if (length == 0.0)
+        return vec2(0.0);
+
+    return value / length;
+}
+
+vec2 wrappedDifference(vec2 from, vec2 to, vec2 canvasSize)
+{
+    vec2 difference = to - from;
+
+    if (difference.x > canvasSize.x * 0.5)
+        difference.x -= canvasSize.x;
+    else if (difference.x < -canvasSize.x * 0.5)
+        difference.x += canvasSize.x;
+
+    if (difference.y > canvasSize.y * 0.5)
+        difference.y -= canvasSize.y;
+    else if (difference.y < -canvasSize.y * 0.5)
+        difference.y += canvasSize.y;
+
+    return difference;
+}
+
+void main()
+{
+    uint index = gl_GlobalInvocationID.x;
+
+    if (index >= particleCount)
+        return;
+
+    Particle particle = particles[index];
+
+    vec2 position = vec2(particle.positionX, particle.positionY);
+
+    vec2 totalForce = vec2(0.0);
+
+    float maxDistanceSquared = simulation.maxAttractionArea * simulation.maxAttractionArea;
+
+    for (uint i = 0; i < particleCount; i++)
+    {
+        if (i == index)
+            continue;
+
+        Particle other = particles[i];
+
+        vec2 otherPosition = vec2(other.positionX, other.positionY);
+
+        vec2 difference = wrappedDifference(
+            position,
+            otherPosition,
+            vec2(simulation.width, simulation.height)
+        );
+
+        float distanceSquared =
+            dot(difference, difference);
+
+        if (distanceSquared > maxDistanceSquared)
+        {
+            continue;
+        }
+
+        float dist = sqrt(distanceSquared);
+
+        vec2 direction = normalizeVector(difference);
+
+        if (dist < simulation.innateRepulsionArea)
+        {
+            float forceMultiplier =
+                1.0 -
+                dist /
+                simulation.innateRepulsionArea;
+
+            totalForce +=
+                direction *
+                simulation.innateRepulsion *
+                forceMultiplier;
+
+            continue;
+        }
+
+        uint attractionIndex = 
+            uint(particle.typeId) * 
+            simulation.numTypes + 
+            uint(other.typeId);
+
+        float attraction = simulation.attraction[attractionIndex];
+
+        attraction = clamp(
+                attraction,
+                -simulation.maxAttraction,
+                simulation.maxAttraction);
+
+        float midpoint = (simulation.innateRepulsionArea + 
+                        simulation.maxAttractionArea) / 2.0;
+
+        float forceMultiplier = 1.0 - abs(dist - midpoint) / 
+                                (simulation.maxAttractionArea - midpoint);
+
+        totalForce += direction * attraction * forceMultiplier;
+    }
+
+    particle.velocityX += totalForce.x;
+
+    particle.velocityY += totalForce.y;
+
+    particle.velocityX *= simulation.damping;
+
+    particle.velocityY *= simulation.damping;
+
+    vec2 velocity = vec2(particle.velocityX, particle.velocityY);
+
+    float speed = magnitude(velocity);
+
+    if (speed > simulation.maxSpeed)
+    {
+        velocity =
+            normalizeVector(velocity) *
+            simulation.maxSpeed;
+
+        particle.velocityX = velocity.x;
+
+        particle.velocityY = velocity.y;
+    }
+
+    particle.positionX += particle.velocityX;
+
+    particle.positionY += particle.velocityY;
+
+    if (particle.positionX < 0.0)
+    {
+        particle.positionX += simulation.width;
+    }
+    else if (particle.positionX >= simulation.width)
+    {
+        particle.positionX -= simulation.width;
+    }
+
+    if (particle.positionY < 0.0)
+    {
+        particle.positionY += simulation.height;
+    }
+    else if (particle.positionY >= simulation.height)
+    {
+        particle.positionY -= simulation.height;
+    }
+
+    particles[index] = particle;
+}

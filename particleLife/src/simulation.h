@@ -6,7 +6,7 @@
 
 #include <vector>
 
-// Simulation stores the particles and applies calculations to them
+// simulation stores the particles and applies calculations to them
 
 class Simulation
 {
@@ -24,7 +24,11 @@ public:
     SimData &getData() { return data; }
     std::vector<Particle> &getParticles() { return particles; }
 
+    void randomizePositions();
+    void updateParticleSize(int typeID, float size);
+
 private:
+    // cpu implementation
     std::vector<Particle *> getParticlesInRange(Particle &particle);
     Vector2 calculateForces(ParticleData &particle, ParticleData &other);
 

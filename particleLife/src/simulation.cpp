@@ -42,6 +42,8 @@ void Simulation::updateParticles()
     }
 }
 
+// TODO bug when batch adding 2+ particles outside type check does work
+//  ^ adds one type for each particle outside range (all of them)
 void Simulation::addParticle(const ParticleConfig config)
 {
     int typeId = config.typeId;
@@ -94,6 +96,25 @@ void Simulation::resetAttraction()
 {
     data.attraction.clear();
     data.numTypes = 0;
+}
+
+// not random at all just puts all in center
+void Simulation::randomizePositions()
+{
+    for (Particle &p : particles)
+    {
+        p.getDataRef().position = {data.dimensions.x / 2,
+                                   data.dimensions.y / 2};
+    }
+}
+
+void Simulation::updateParticleSize(int typeID, float size)
+{
+    for (Particle &p : particles)
+    {
+        if (typeID == p.getDataConst().typeId)
+            p.getDataRef().size = size;
+    }
 }
 
 // another expensive function called a shit ton

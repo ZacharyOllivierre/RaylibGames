@@ -1,9 +1,20 @@
 #include "controls.h"
 #include "raylib.h"
 
+Controls::Controls(Simulation *sim, ParticleConfig startingConfig)
+    : simulation(sim), particleConfig(startingConfig)
+{
+    camera.target = {600, 400};
+    camera.offset = {600, 400};
+    camera.zoom = 1.0f;
+}
+
 void Controls::runControls()
 {
-    Vector2 mousePos = GetMousePosition();
+    cameraControls();
+    numpadControls();
+
+    Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camera);
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {
@@ -11,6 +22,7 @@ void Controls::runControls()
     }
 }
 
+// TODO make this work with held clicks
 void Controls::mouseControls(const Vector2 &mousePos)
 {
     // TODO change to switch
@@ -34,5 +46,54 @@ void Controls::mouseControls(const Vector2 &mousePos)
     else
     {
         return;
+    }
+}
+
+void Controls::cameraControls()
+{
+    float speed = 500.0f * GetFrameTime();
+
+    // move
+    if (IsKeyDown(KEY_W))
+        camera.target.y -= speed;
+    if (IsKeyDown(KEY_S))
+        camera.target.y += speed;
+    if (IsKeyDown(KEY_A))
+        camera.target.x -= speed;
+    if (IsKeyDown(KEY_D))
+        camera.target.x += speed;
+
+    // zoom
+    float zoomAmount = 0.05;
+    if (IsKeyDown(KEY_UP))
+        camera.zoom += zoomAmount;
+    if (IsKeyDown(KEY_DOWN))
+        camera.zoom -= zoomAmount;
+
+    // clamp zoom
+    if (camera.zoom < 0.2f)
+        camera.zoom = 0.2f;
+
+    if (camera.zoom > 3.0f)
+        camera.zoom = 3.0f;
+}
+
+// numpad number -> click type
+void Controls::numpadControls()
+{
+    // select
+    if (IsKeyPressed(KEY_ONE))
+    {
+        data.clickType = ClickType::Select;
+    }
+    // add
+    else if (IsKeyPressed(KEY_TWO))
+    {
+        data.clickType = ClickType::Add;
+    }
+    // remove
+    else if (IsKeyPressed(KEY_THREE))
+    {
+        data.clickType = ClickType::Remove;
     }
 }

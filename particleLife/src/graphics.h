@@ -11,9 +11,9 @@ public:
 
     void draw();
 
-private:
     Color getParticleColor(int typeId);
 
+private:
 private:
     std::vector<Particle> &particles;
 };
