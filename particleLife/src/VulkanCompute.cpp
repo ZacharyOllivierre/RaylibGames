@@ -35,43 +35,22 @@ void VulkanCompute::initialize(Simulation &simulation)
 {
     VkApplicationInfo appInfo{};
 
-    appInfo.sType =
-        VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = "Particle Life";
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = "Particle Life";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_2;
 
-    appInfo.pApplicationName =
-        "Particle Life";
-
-    appInfo.applicationVersion =
-        VK_MAKE_VERSION(1, 0, 0);
-
-    appInfo.pEngineName =
-        "Particle Life";
-
-    appInfo.engineVersion =
-        VK_MAKE_VERSION(1, 0, 0);
-
-    appInfo.apiVersion =
-        VK_API_VERSION_1_2;
-
-    const char *extensions[] = {
-        VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME};
+    const char *extensions[] = {VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME};
 
     VkInstanceCreateInfo createInfo{};
 
-    createInfo.sType =
-        VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-
-    createInfo.flags =
-        VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-
-    createInfo.pApplicationInfo =
-        &appInfo;
-
-    createInfo.enabledExtensionCount =
-        1;
-
-    createInfo.ppEnabledExtensionNames =
-        extensions;
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    createInfo.pApplicationInfo = &appInfo;
+    createInfo.enabledExtensionCount = 1;
+    createInfo.ppEnabledExtensionNames = extensions;
 
     if (vkCreateInstance(
             &createInfo,
@@ -245,17 +224,13 @@ void VulkanCompute::createParticleBuffer(size_t particleCount)
 
     VkBufferCreateInfo bufferInfo{};
 
-    bufferInfo.sType =
-        VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 
-    bufferInfo.size =
-        bufferSize;
+    bufferInfo.size = bufferSize;
 
-    bufferInfo.usage =
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
-    bufferInfo.sharingMode =
-        VK_SHARING_MODE_EXCLUSIVE;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateBuffer(device, &bufferInfo,
                        nullptr, &particleBuffer) != VK_SUCCESS)
@@ -302,8 +277,7 @@ void VulkanCompute::createParticleBuffer(size_t particleCount)
 
     particleCapacity = bufferCount;
 
-    std::cout << "Particle buffer created: " << bufferCount
-              << " particle slots\n";
+    std::cout << "Particle buffer created: " << bufferCount << " particle slots\n";
 
     if (descriptorSet != VK_NULL_HANDLE)
         updateDescriptorSet();
@@ -313,17 +287,13 @@ void VulkanCompute::createSimulationBuffers(Simulation &simulation)
 {
     VkBufferCreateInfo bufferInfo{};
 
-    bufferInfo.sType =
-        VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 
-    bufferInfo.size =
-        sizeof(GPUSimulation);
+    bufferInfo.size = sizeof(GPUSimulation);
 
-    bufferInfo.usage =
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+    bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
 
-    bufferInfo.sharingMode =
-        VK_SHARING_MODE_EXCLUSIVE;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateBuffer(
             device,
@@ -335,8 +305,7 @@ void VulkanCompute::createSimulationBuffers(Simulation &simulation)
             "Failed to create simulation buffer");
     }
 
-    VkMemoryRequirements
-        memoryRequirements{};
+    VkMemoryRequirements memoryRequirements{};
 
     vkGetBufferMemoryRequirements(
         device,
@@ -345,8 +314,7 @@ void VulkanCompute::createSimulationBuffers(Simulation &simulation)
 
     VkMemoryAllocateInfo allocateInfo{};
 
-    allocateInfo.sType =
-        VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 
     allocateInfo.allocationSize = memoryRequirements.size;
 
@@ -381,8 +349,7 @@ uint32_t VulkanCompute::findMemoryType(
     uint32_t typeFilter,
     VkMemoryPropertyFlags properties)
 {
-    VkPhysicalDeviceMemoryProperties
-        memoryProperties{};
+    VkPhysicalDeviceMemoryProperties memoryProperties{};
 
     vkGetPhysicalDeviceMemoryProperties(
         physicalDevice,
@@ -404,13 +371,11 @@ uint32_t VulkanCompute::findMemoryType(
 
 void VulkanCompute::uploadParticles(const std::vector<Particle> &particles)
 {
-    if (particles.size() >
-        particleCapacity)
+    if (particles.size() > particleCapacity)
     {
         vkDeviceWaitIdle(device);
 
-        size_t newCapacity =
-            particleCapacity;
+        size_t newCapacity = particleCapacity;
 
         if (newCapacity == 0)
             newCapacity = 1;
@@ -421,22 +386,19 @@ void VulkanCompute::uploadParticles(const std::vector<Particle> &particles)
             newCapacity *= 2;
         }
 
-        createParticleBuffer(
-            newCapacity);
+        createParticleBuffer(newCapacity);
     }
 
     if (particles.empty())
         return;
 
-    void *mappedMemory =
-        nullptr;
+    void *mappedMemory = nullptr;
 
     if (vkMapMemory(
             device,
             particleMemory,
             0,
-            sizeof(GPUParticle) *
-                particles.size(),
+            sizeof(GPUParticle) * particles.size(),
             0,
             &mappedMemory) != VK_SUCCESS)
     {
@@ -444,110 +406,61 @@ void VulkanCompute::uploadParticles(const std::vector<Particle> &particles)
             "Failed to map particle memory");
     }
 
-    GPUParticle *gpuParticles =
-        static_cast<GPUParticle *>(
-            mappedMemory);
+    GPUParticle *gpuParticles = static_cast<GPUParticle *>(mappedMemory);
 
-    for (size_t i = 0;
-         i < particles.size();
-         i++)
+    for (size_t i = 0; i < particles.size(); i++)
     {
-        const ParticleData &data =
-            particles[i].getDataConst();
+        const ParticleData &data = particles[i].getDataConst();
 
-        gpuParticles[i].typeId =
-            data.typeId;
+        gpuParticles[i].typeId = data.typeId;
+        gpuParticles[i].size = data.size;
 
-        gpuParticles[i].size =
-            data.size;
+        gpuParticles[i].positionX = data.position.x;
+        gpuParticles[i].positionY = data.position.y;
 
-        gpuParticles[i].positionX =
-            data.position.x;
-
-        gpuParticles[i].positionY =
-            data.position.y;
-
-        gpuParticles[i].velocityX =
-            data.velocity.x;
-
-        gpuParticles[i].velocityY =
-            data.velocity.y;
+        gpuParticles[i].velocityX = data.velocity.x;
+        gpuParticles[i].velocityY = data.velocity.y;
     }
 
-    vkUnmapMemory(
-        device,
-        particleMemory);
+    vkUnmapMemory(device, particleMemory);
 }
 
 void VulkanCompute::uploadSimulation(Simulation &simulation)
 {
-    const SimData &data =
-        simulation.getData();
+    const SimData &data = simulation.getData();
 
     GPUSimulation gpuData{};
 
-    gpuData.innateRepulsionArea =
-        data.innateRepulsionArea;
+    gpuData.innateRepulsionArea = data.innateRepulsionArea;
+    gpuData.innateRepulsion = data.innateRepulsion;
+    gpuData.maxAttractionArea = data.maxAttractionArea;
+    gpuData.maxAttraction = data.maxAttraction;
+    gpuData.maxSpeed = data.maxSpeed;
+    gpuData.damping = data.damping;
+    gpuData.densityLimit = data.densityLimit;
+    gpuData.width = data.dimensions.x;
+    gpuData.height = data.dimensions.y;
+    gpuData.numTypes = static_cast<uint32_t>(data.numTypes);
 
-    gpuData.innateRepulsion =
-        data.innateRepulsion;
-
-    gpuData.maxAttractionArea =
-        data.maxAttractionArea;
-
-    gpuData.maxAttraction =
-        data.maxAttraction;
-
-    gpuData.maxSpeed =
-        data.maxSpeed;
-
-    gpuData.damping =
-        data.damping;
-
-    gpuData.width =
-        data.dimensions.x;
-
-    gpuData.height =
-        data.dimensions.y;
-
-    gpuData.numTypes =
-        static_cast<uint32_t>(
-            data.numTypes);
-
-    for (int i = 0;
-         i < data.numTypes;
-         i++)
+    for (int i = 0; i < data.numTypes; i++)
     {
-        for (int j = 0;
-             j < data.numTypes;
-             j++)
+        for (int j = 0; j < data.numTypes; j++)
         {
-            size_t index =
-                static_cast<size_t>(i) *
-                    data.numTypes +
-                j;
+            size_t index = static_cast<size_t>(i) * data.numTypes + j;
 
             if (index < 256)
             {
-                gpuData.attraction[index] =
-                    data.attraction[i][j];
+                gpuData.attraction[index] = data.attraction[i][j];
             }
         }
     }
 
-    void *mapped =
-        nullptr;
+    void *mapped = nullptr;
 
-    if (vkMapMemory(
-            device,
-            simulationMemory,
-            0,
-            sizeof(GPUSimulation),
-            0,
-            &mapped) != VK_SUCCESS)
+    if (vkMapMemory(device, simulationMemory, 0,
+                    sizeof(GPUSimulation), 0, &mapped) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to map simulation memory");
+        throw std::runtime_error("Failed to map simulation memory");
     }
 
     std::memcpy(
@@ -562,17 +475,13 @@ void VulkanCompute::uploadSimulation(Simulation &simulation)
 
 void VulkanCompute::createComputePipeline()
 {
-    std::vector<char> shaderCode =
-        readFile(
-            "shaders/particle.comp.spv");
+    std::vector<char> shaderCode = readFile("shaders/particle.comp.spv");
 
     VkShaderModuleCreateInfo shaderInfo{};
 
-    shaderInfo.sType =
-        VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 
-    shaderInfo.codeSize =
-        shaderCode.size();
+    shaderInfo.codeSize = shaderCode.size();
 
     shaderInfo.pCode =
         reinterpret_cast<const uint32_t *>(
@@ -633,30 +542,23 @@ void VulkanCompute::createComputePipeline()
 
     VkPushConstantRange pushConstant{};
 
-    pushConstant.stageFlags =
-        VK_SHADER_STAGE_COMPUTE_BIT;
+    pushConstant.stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
 
     pushConstant.offset = 0;
 
-    pushConstant.size =
-        sizeof(uint32_t);
+    pushConstant.size = sizeof(uint32_t);
 
-    VkPipelineLayoutCreateInfo
-        pipelineLayoutInfo{};
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 
-    pipelineLayoutInfo.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     pipelineLayoutInfo.setLayoutCount = 1;
 
-    pipelineLayoutInfo.pSetLayouts =
-        &descriptorSetLayout;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
 
-    pipelineLayoutInfo.pushConstantRangeCount =
-        1;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
 
-    pipelineLayoutInfo.pPushConstantRanges =
-        &pushConstant;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
 
     if (vkCreatePipelineLayout(
             device,
@@ -668,32 +570,23 @@ void VulkanCompute::createComputePipeline()
             "Failed to create pipeline layout");
     }
 
-    VkPipelineShaderStageCreateInfo
-        shaderStage{};
+    VkPipelineShaderStageCreateInfo shaderStage{};
 
-    shaderStage.sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 
-    shaderStage.stage =
-        VK_SHADER_STAGE_COMPUTE_BIT;
+    shaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
 
-    shaderStage.module =
-        computeShader;
+    shaderStage.module = computeShader;
 
-    shaderStage.pName =
-        "main";
+    shaderStage.pName = "main";
 
-    VkComputePipelineCreateInfo
-        pipelineInfo{};
+    VkComputePipelineCreateInfo pipelineInfo{};
 
-    pipelineInfo.sType =
-        VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
 
-    pipelineInfo.stage =
-        shaderStage;
+    pipelineInfo.stage = shaderStage;
 
-    pipelineInfo.layout =
-        pipelineLayout;
+    pipelineInfo.layout = pipelineLayout;
 
     if (vkCreateComputePipelines(
             device,
@@ -703,34 +596,26 @@ void VulkanCompute::createComputePipeline()
             nullptr,
             &computePipeline) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to create compute pipeline");
+        throw std::runtime_error("Failed to create compute pipeline");
     }
 
-    std::cout
-        << "Compute pipeline created\n";
+    std::cout << "Compute pipeline created\n";
 }
 
 void VulkanCompute::createDescriptorResources()
 {
     VkDescriptorPoolSize poolSize{};
 
-    poolSize.type =
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-
+    poolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     poolSize.descriptorCount = 2;
 
     VkDescriptorPoolCreateInfo poolInfo{};
 
-    poolInfo.sType =
-        VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.maxSets = 1;
-
     poolInfo.poolSizeCount = 1;
 
-    poolInfo.pPoolSizes =
-        &poolSize;
+    poolInfo.pPoolSizes = &poolSize;
 
     if (vkCreateDescriptorPool(
             device,
@@ -738,94 +623,65 @@ void VulkanCompute::createDescriptorResources()
             nullptr,
             &descriptorPool) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to create descriptor pool");
+        throw std::runtime_error("Failed to create descriptor pool");
     }
 
     VkDescriptorSetAllocateInfo allocateInfo{};
 
-    allocateInfo.sType =
-        VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 
-    allocateInfo.descriptorPool =
-        descriptorPool;
+    allocateInfo.descriptorPool = descriptorPool;
 
-    allocateInfo.descriptorSetCount =
-        1;
+    allocateInfo.descriptorSetCount = 1;
 
-    allocateInfo.pSetLayouts =
-        &descriptorSetLayout;
+    allocateInfo.pSetLayouts = &descriptorSetLayout;
 
     if (vkAllocateDescriptorSets(
             device,
             &allocateInfo,
             &descriptorSet) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to allocate descriptor set");
+        throw std::runtime_error("Failed to allocate descriptor set");
     }
 
     updateDescriptorSet();
 
-    std::cout
-        << "Descriptor resources created\n";
+    std::cout << "Descriptor resources created\n";
 }
 
 void VulkanCompute::updateDescriptorSet()
 {
     VkDescriptorBufferInfo particleInfo{};
 
-    particleInfo.buffer =
-        particleBuffer;
+    particleInfo.buffer = particleBuffer;
 
     particleInfo.offset = 0;
 
-    particleInfo.range =
-        VK_WHOLE_SIZE;
+    particleInfo.range = VK_WHOLE_SIZE;
 
     VkDescriptorBufferInfo simulationInfo{};
 
-    simulationInfo.buffer =
-        simulationBuffer;
+    simulationInfo.buffer = simulationBuffer;
 
     simulationInfo.offset = 0;
 
-    simulationInfo.range =
-        sizeof(GPUSimulation);
+    simulationInfo.range = sizeof(GPUSimulation);
 
     VkWriteDescriptorSet writes[2]{};
 
-    writes[0].sType =
-        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-
-    writes[0].dstSet =
-        descriptorSet;
-
+    writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[0].dstSet = descriptorSet;
     writes[0].dstBinding = 0;
-
-    writes[0].descriptorType =
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-
+    writes[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[0].descriptorCount = 1;
+    writes[0].pBufferInfo = &particleInfo;
 
-    writes[0].pBufferInfo =
-        &particleInfo;
-
-    writes[1].sType =
-        VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-
-    writes[1].dstSet =
-        descriptorSet;
-
+    writes[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    writes[1].dstSet = descriptorSet;
     writes[1].dstBinding = 1;
-
-    writes[1].descriptorType =
-        VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
-
+    writes[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
     writes[1].descriptorCount = 1;
-
-    writes[1].pBufferInfo =
-        &simulationInfo;
+    writes[1].pBufferInfo = &simulationInfo;
 
     vkUpdateDescriptorSets(
         device,
@@ -839,14 +695,11 @@ void VulkanCompute::createCommandResources()
 {
     VkCommandPoolCreateInfo poolInfo{};
 
-    poolInfo.sType =
-        VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 
-    poolInfo.flags =
-        VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
-    poolInfo.queueFamilyIndex =
-        computeQueueFamily;
+    poolInfo.queueFamilyIndex = computeQueueFamily;
 
     if (vkCreateCommandPool(
             device,
@@ -854,21 +707,14 @@ void VulkanCompute::createCommandResources()
             nullptr,
             &commandPool) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to create command pool");
+        throw std::runtime_error("Failed to create command pool");
     }
 
     VkCommandBufferAllocateInfo bufferInfo{};
 
-    bufferInfo.sType =
-        VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-
-    bufferInfo.commandPool =
-        commandPool;
-
-    bufferInfo.level =
-        VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-
+    bufferInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    bufferInfo.commandPool = commandPool;
+    bufferInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     bufferInfo.commandBufferCount = 1;
 
     if (vkAllocateCommandBuffers(
@@ -876,14 +722,12 @@ void VulkanCompute::createCommandResources()
             &bufferInfo,
             &commandBuffer) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to allocate command buffer");
+        throw std::runtime_error("Failed to allocate command buffer");
     }
 
     VkFenceCreateInfo fenceInfo{};
 
-    fenceInfo.sType =
-        VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 
     if (vkCreateFence(
             device,
@@ -891,12 +735,10 @@ void VulkanCompute::createCommandResources()
             nullptr,
             &computeFence) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to create compute fence");
+        throw std::runtime_error("Failed to create compute fence");
     }
 
-    std::cout
-        << "Command resources created\n";
+    std::cout << "Command resources created\n";
 }
 
 void VulkanCompute::dispatch(size_t particleCount)
@@ -907,8 +749,7 @@ void VulkanCompute::dispatch(size_t particleCount)
     if (particleCount >
         particleCapacity)
     {
-        throw std::runtime_error(
-            "Particle count exceeds GPU buffer capacity");
+        throw std::runtime_error("Particle count exceeds GPU buffer capacity");
     }
 
     vkResetFences(
@@ -922,15 +763,11 @@ void VulkanCompute::dispatch(size_t particleCount)
 
     VkCommandBufferBeginInfo beginInfo{};
 
-    beginInfo.sType =
-        VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    if (vkBeginCommandBuffer(
-            commandBuffer,
-            &beginInfo) != VK_SUCCESS)
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to begin command buffer");
+        throw std::runtime_error("Failed to begin command buffer");
     }
 
     vkCmdBindPipeline(
@@ -948,9 +785,7 @@ void VulkanCompute::dispatch(size_t particleCount)
         0,
         nullptr);
 
-    uint32_t count =
-        static_cast<uint32_t>(
-            particleCount);
+    uint32_t count = static_cast<uint32_t>(particleCount);
 
     vkCmdPushConstants(
         commandBuffer,
@@ -960,9 +795,7 @@ void VulkanCompute::dispatch(size_t particleCount)
         sizeof(uint32_t),
         &count);
 
-    uint32_t workgroups =
-        static_cast<uint32_t>(
-            (particleCount + 63) / 64);
+    uint32_t workgroups = static_cast<uint32_t>((particleCount + 63) / 64);
 
     vkCmdDispatch(
         commandBuffer,
@@ -970,32 +803,22 @@ void VulkanCompute::dispatch(size_t particleCount)
         1,
         1);
 
-    if (vkEndCommandBuffer(
-            commandBuffer) != VK_SUCCESS)
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to end command buffer");
+        throw std::runtime_error("Failed to end command buffer");
     }
 
     VkSubmitInfo submitInfo{};
 
-    submitInfo.sType =
-        VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    submitInfo.commandBufferCount =
-        1;
+    submitInfo.commandBufferCount = 1;
 
-    submitInfo.pCommandBuffers =
-        &commandBuffer;
+    submitInfo.pCommandBuffers = &commandBuffer;
 
-    if (vkQueueSubmit(
-            computeQueue,
-            1,
-            &submitInfo,
-            computeFence) != VK_SUCCESS)
+    if (vkQueueSubmit(computeQueue, 1, &submitInfo, computeFence) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to submit compute command");
+        throw std::runtime_error("Failed to submit compute command");
     }
 
     if (vkWaitForFences(
@@ -1005,8 +828,7 @@ void VulkanCompute::dispatch(size_t particleCount)
             VK_TRUE,
             UINT64_MAX) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed waiting for compute fence");
+        throw std::runtime_error("Failed waiting for compute fence");
     }
 }
 
@@ -1015,15 +837,12 @@ void VulkanCompute::readbackParticles(std::vector<Particle> &particles)
     if (particles.empty())
         return;
 
-    if (particles.size() >
-        particleCapacity)
+    if (particles.size() > particleCapacity)
     {
-        throw std::runtime_error(
-            "Particle count exceeds GPU buffer capacity");
+        throw std::runtime_error("Particle count exceeds GPU buffer capacity");
     }
 
-    void *mappedMemory =
-        nullptr;
+    void *mappedMemory = nullptr;
 
     if (vkMapMemory(
             device,
@@ -1034,43 +853,24 @@ void VulkanCompute::readbackParticles(std::vector<Particle> &particles)
             0,
             &mappedMemory) != VK_SUCCESS)
     {
-        throw std::runtime_error(
-            "Failed to map particle memory for readback");
+        throw std::runtime_error("Failed to map particle memory for readback");
     }
 
-    GPUParticle *gpuParticles =
-        static_cast<GPUParticle *>(
-            mappedMemory);
+    GPUParticle *gpuParticles = static_cast<GPUParticle *>(mappedMemory);
 
-    for (size_t i = 0;
-         i < particles.size();
-         i++)
+    for (size_t i = 0; i < particles.size(); i++)
     {
-        ParticleData &data =
-            particles[i].getDataRef();
+        ParticleData &data = particles[i].getDataRef();
 
-        data.typeId =
-            gpuParticles[i].typeId;
-
-        data.size =
-            gpuParticles[i].size;
-
-        data.position.x =
-            gpuParticles[i].positionX;
-
-        data.position.y =
-            gpuParticles[i].positionY;
-
-        data.velocity.x =
-            gpuParticles[i].velocityX;
-
-        data.velocity.y =
-            gpuParticles[i].velocityY;
+        data.typeId = gpuParticles[i].typeId;
+        data.size = gpuParticles[i].size;
+        data.position.x = gpuParticles[i].positionX;
+        data.position.y = gpuParticles[i].positionY;
+        data.velocity.x = gpuParticles[i].velocityX;
+        data.velocity.y = gpuParticles[i].velocityY;
     }
 
-    vkUnmapMemory(
-        device,
-        particleMemory);
+    vkUnmapMemory(device, particleMemory);
 }
 
 VulkanCompute::~VulkanCompute()

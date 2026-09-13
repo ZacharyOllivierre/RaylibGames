@@ -31,6 +31,7 @@ struct GPUSimulation
     float maxAttraction;
     float maxSpeed;
     float damping;
+    float densityLimit;
 
     float width;
     float height;

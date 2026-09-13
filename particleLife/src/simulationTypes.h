@@ -3,12 +3,14 @@
 
 struct SimData
 {
-    float innateRepulsionArea = 5;
-    float innateRepulsion = -1;
-    float maxAttractionArea = 50;
-    float maxAttraction = 25;
-    float maxSpeed = 100;
-    float damping = 10;
+    float innateRepulsionArea;
+    float innateRepulsion;
+    float maxAttractionArea;
+    float maxAttraction;
+    float maxSpeed;
+    float damping;
+    // TODO implement
+    float densityLimit;
 
     // canvas dimensions
     const Vector2 dimensions;
@@ -20,11 +22,11 @@ struct SimData
     SimData(
         float innateRepulsionArea, float innateRepulsion, float maxAttractionArea,
         float maxAttraction, float maxSpeed,
-        float damping, Vector2 dimensions, int numTypes)
+        float damping, float densityLimit, Vector2 dimensions, int numTypes)
         : innateRepulsionArea(innateRepulsionArea), innateRepulsion(innateRepulsion),
           maxAttractionArea(maxAttractionArea), maxAttraction(maxAttraction),
-          maxSpeed(maxSpeed), damping(damping), dimensions(dimensions), numTypes(numTypes),
-          attraction(numTypes, std::vector<float>(numTypes, 0.0f)) {}
+          maxSpeed(maxSpeed), damping(damping), densityLimit(densityLimit), dimensions(dimensions),
+          numTypes(numTypes), attraction(numTypes, std::vector<float>(numTypes, 0.0f)) {}
 };
 
 // TODO Reduce the structs to one dont need a sep config

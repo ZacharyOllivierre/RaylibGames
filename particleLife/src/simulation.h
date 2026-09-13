@@ -20,11 +20,12 @@ public:
 
     void clear();
     void resetAttraction();
+    void clearAttraction();
 
     SimData &getData() { return data; }
     std::vector<Particle> &getParticles() { return particles; }
 
-    void randomizePositions();
+    void centerAll();
     void updateParticleSize(int typeID, float size);
 
 private:

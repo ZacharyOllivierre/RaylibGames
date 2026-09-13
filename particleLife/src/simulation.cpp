@@ -94,12 +94,22 @@ void Simulation::clear()
 
 void Simulation::resetAttraction()
 {
+    for (auto &y : data.attraction)
+    {
+        for (size_t i = 0; i < y.size(); i++)
+        {
+            y[i] = 0.0f;
+        }
+    }
+}
+
+void Simulation::clearAttraction()
+{
     data.attraction.clear();
     data.numTypes = 0;
 }
 
-// not random at all just puts all in center
-void Simulation::randomizePositions()
+void Simulation::centerAll()
 {
     for (Particle &p : particles)
     {

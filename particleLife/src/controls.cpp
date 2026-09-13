@@ -71,11 +71,11 @@ void Controls::cameraControls()
         camera.zoom -= zoomAmount;
 
     // clamp zoom
-    if (camera.zoom < 0.2f)
-        camera.zoom = 0.2f;
+    if (camera.zoom < 0.1f)
+        camera.zoom = 0.1f;
 
-    if (camera.zoom > 3.0f)
-        camera.zoom = 3.0f;
+    if (camera.zoom > 5.0f)
+        camera.zoom = 5.0f;
 }
 
 // numpad number -> click type

@@ -40,5 +40,5 @@ private:
 
     ControlData data;
 
-    Camera2D camera = {0, 0};
+    Camera2D camera = {{0, 0}, {0, 0}, 0.0f, 0.0f};
 };

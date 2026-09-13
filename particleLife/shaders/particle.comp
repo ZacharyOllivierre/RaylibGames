@@ -1,5 +1,11 @@
 #version 450
 
+/* 
+TODO
+move density into compute pass and store it as a density buffer 
+to avoid repeating the O(n^2) density loop every force calculation 
+*/
+
 struct Particle
 {
     int typeId;
@@ -20,6 +26,8 @@ struct SimParameters
     float maxAttraction;
     float maxSpeed;
     float damping;
+
+    float densityLimit;
 
     float width;
     float height;
@@ -87,12 +95,18 @@ void main()
 
     Particle particle = particles[index];
 
-    vec2 position = vec2(particle.positionX, particle.positionY);
+    vec2 position = vec2(
+        particle.positionX,
+        particle.positionY
+    );
 
     vec2 totalForce = vec2(0.0);
 
-    float maxDistanceSquared = simulation.maxAttractionArea * simulation.maxAttractionArea;
+    float attractionRadius = simulation.maxAttractionArea;
+    float attractionRadiusSquared = attractionRadius * attractionRadius;
 
+    // calculate weighted local density in first pass
+    float localDensity = 0.0;
     for (uint i = 0; i < particleCount; i++)
     {
         if (i == index)
@@ -100,7 +114,10 @@ void main()
 
         Particle other = particles[i];
 
-        vec2 otherPosition = vec2(other.positionX, other.positionY);
+        vec2 otherPosition = vec2(
+            other.positionX,
+            other.positionY
+        );
 
         vec2 difference = wrappedDifference(
             position,
@@ -108,13 +125,58 @@ void main()
             vec2(simulation.width, simulation.height)
         );
 
-        float distanceSquared =
-            dot(difference, difference);
+        float distanceSquared = dot(difference, difference);
 
-        if (distanceSquared > maxDistanceSquared)
-        {
+        if (distanceSquared > attractionRadiusSquared)
             continue;
-        }
+
+        float dist = sqrt(distanceSquared);
+
+        float densityWeight = max(
+            0.0,
+            1.0 - dist / attractionRadius
+        );
+
+        if (particle.typeId == other.typeId)
+            localDensity += densityWeight;
+        else
+            localDensity += densityWeight * 0.5;
+    }
+
+    // reduce positive attraction once density exceeds limit
+    float densityFactor = 1.0;
+    if (localDensity > simulation.densityLimit)
+    {
+        densityFactor = clamp(
+            1.0 - (localDensity - simulation.densityLimit),
+            0.0,
+            1.0
+        );
+    }
+
+    // calculate forces using the density from first pass
+    for (uint i = 0; i < particleCount; i++)
+    {
+        if (i == index)
+            continue;
+
+        Particle other = particles[i];
+
+        vec2 otherPosition = vec2(
+            other.positionX,
+            other.positionY
+        );
+
+        vec2 difference = wrappedDifference(
+            position,
+            otherPosition,
+            vec2(simulation.width, simulation.height)
+        );
+
+        float distanceSquared = dot(difference, difference);
+
+        if (distanceSquared > attractionRadiusSquared)
+            continue;
 
         float dist = sqrt(distanceSquared);
 
@@ -122,49 +184,84 @@ void main()
 
         if (dist < simulation.innateRepulsionArea)
         {
-            float forceMultiplier =
-                1.0 -
-                dist /
-                simulation.innateRepulsionArea;
+            if (simulation.innateRepulsionArea > 0.0)
+            {
+                float forceMultiplier = 1.0 - dist / simulation.innateRepulsionArea;
 
-            totalForce +=
-                direction *
-                simulation.innateRepulsion *
-                forceMultiplier;
+                forceMultiplier = clamp(
+                    forceMultiplier,
+                    0.0,
+                    1.0
+                );
+
+                totalForce +=
+                    direction *
+                    simulation.innateRepulsion *
+                    forceMultiplier;
+            }
 
             continue;
         }
 
-        uint attractionIndex = 
-            uint(particle.typeId) * 
-            simulation.numTypes + 
+        uint attractionIndex =
+            uint(particle.typeId) *
+            simulation.numTypes +
             uint(other.typeId);
 
-        float attraction = simulation.attraction[attractionIndex];
+        float attraction =
+            simulation.attraction[attractionIndex];
 
         attraction = clamp(
-                attraction,
-                -simulation.maxAttraction,
-                simulation.maxAttraction);
+            attraction,
+            -simulation.maxAttraction,
+            simulation.maxAttraction
+        );
 
-        float midpoint = (simulation.innateRepulsionArea + 
-                        simulation.maxAttractionArea) / 2.0;
+        // only affect positive attraction by density
+        if (attraction > 0.0)
+            attraction *= densityFactor;
 
-        float forceMultiplier = 1.0 - abs(dist - midpoint) / 
-                                (simulation.maxAttractionArea - midpoint);
+        float midpoint =
+            (
+                simulation.innateRepulsionArea +
+                simulation.maxAttractionArea
+            ) * 0.5;
 
-        totalForce += direction * attraction * forceMultiplier;
+        float attractionRange =
+            simulation.maxAttractionArea - midpoint;
+
+        float forceMultiplier = 0.0;
+
+        if (attractionRange > 0.0)
+        {
+            forceMultiplier =
+                1.0 -
+                abs(dist - midpoint) /
+                attractionRange;
+
+            forceMultiplier = clamp(
+                forceMultiplier,
+                0.0,
+                1.0
+            );
+        }
+
+        totalForce +=
+            direction *
+            attraction *
+            forceMultiplier;
     }
 
     particle.velocityX += totalForce.x;
-
     particle.velocityY += totalForce.y;
 
     particle.velocityX *= simulation.damping;
-
     particle.velocityY *= simulation.damping;
 
-    vec2 velocity = vec2(particle.velocityX, particle.velocityY);
+    vec2 velocity = vec2(
+        particle.velocityX,
+        particle.velocityY
+    );
 
     float speed = magnitude(velocity);
 
@@ -175,31 +272,21 @@ void main()
             simulation.maxSpeed;
 
         particle.velocityX = velocity.x;
-
         particle.velocityY = velocity.y;
     }
 
     particle.positionX += particle.velocityX;
-
     particle.positionY += particle.velocityY;
 
     if (particle.positionX < 0.0)
-    {
         particle.positionX += simulation.width;
-    }
     else if (particle.positionX >= simulation.width)
-    {
         particle.positionX -= simulation.width;
-    }
 
     if (particle.positionY < 0.0)
-    {
         particle.positionY += simulation.height;
-    }
     else if (particle.positionY >= simulation.height)
-    {
         particle.positionY -= simulation.height;
-    }
 
     particles[index] = particle;
 }
