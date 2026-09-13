@@ -1,5 +1,5 @@
 ## Projects
-  A collection of small games and experiments built using Raylib in C++. 
+  A collection of small games and experiments built using Raylib and C++. 
   
 ### Cellular Automata
   - Multi-Neighborhood Cellular Automata
@@ -10,6 +10,13 @@
   <img src="https://github.com/user-attachments/assets/81d74190-6761-4057-a2cd-dfc62e5172a4" width="45%">
   <img src="https://github.com/user-attachments/assets/37e41e97-c4b0-4c49-947b-85708df4580e" width="45%"/>
   <p>Default Ruleset</p>
+</div>
+
+### Particle Life
+  - Magnetic force based simulation
+  - Emergent behavior from simple interactions
+<div align="center">
+  <p>There should be pictures here soonish</p>
 </div>
 
 ### Pong
