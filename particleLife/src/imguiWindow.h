@@ -8,7 +8,10 @@
 #include "controls.h"
 #include "simulation.h"
 
-void drawImGui(Simulation &simulation, Controls &controls, Graphics &graphics, const Vector2 &worldDimensions);
+#include "preset.h"
+
+void drawImGui(Simulation &simulation, Controls &controls,
+               Graphics &graphics, const Vector2 &worldDimensions, Preset &presets);
 
 std::string simColorToString(const SimColors color);
 

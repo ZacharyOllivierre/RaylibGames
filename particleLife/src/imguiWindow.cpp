@@ -1,6 +1,7 @@
 #include "imguiWindow.h"
 
-void drawImGui(Simulation &simulation, Controls &controls, Graphics &graphics, const Vector2 &worldDimensions)
+void drawImGui(Simulation &simulation, Controls &controls,
+               Graphics &graphics, const Vector2 &worldDimensions, Preset &presets)
 {
     SimData &data = simulation.getData();
     ParticleConfig &config = controls.getParticleConfig();
@@ -204,6 +205,65 @@ void drawImGui(Simulation &simulation, Controls &controls, Graphics &graphics, c
         simulation.updateParticleSize(id, config.size);
     }
 
+    // Presets
+    ImGui::Separator();
+
+    static char textBuffer[30] = "Preset Name";
+    static std::vector<const char *> presetNames;
+    static int selectedPreset;
+
+    ImGui::Text("Presets");
+
+    // if cached list is depricated get the new one
+    if (presets.getIfDirty())
+    {
+        presetNames = presets.getPresetNames();
+
+        if (selectedPreset >= static_cast<int>(presetNames.size()))
+            selectedPreset = 0;
+    }
+
+    if (!presetNames.empty())
+    {
+        ImGui::Combo(
+            "Preset to Load",
+            &selectedPreset,
+            presetNames.data(),
+            static_cast<int>(presetNames.size()));
+
+        if (ImGui::Button("Load"))
+        {
+            presets.load(presetNames[selectedPreset]);
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Remove"))
+        {
+            ImGui::OpenPopup("Remove Preset?");
+        }
+
+        if (ImGui::BeginPopupModal("Remove Preset?", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Remove %s from the preset file?", presetNames[selectedPreset]);
+            if (ImGui::Button("Remove"))
+            {
+                presets.remove(presetNames[selectedPreset]);
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel"))
+                ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
+    }
+
+    ImGui::InputText("Save Name", textBuffer, IM_ARRAYSIZE(textBuffer));
+
+    if (ImGui::Button("Save Preset"))
+    {
+        presets.save(textBuffer);
+    }
+
     // TODO Clean
     ImGui::Separator();
     ImGui::Text("Batch Add");
@@ -234,7 +294,6 @@ void drawImGui(Simulation &simulation, Controls &controls, Graphics &graphics, c
                 config.typeId = i;
                 config.startingPosition.x = GetRandomValue(0, worldDimensions.x);
                 config.startingPosition.y = GetRandomValue(0, worldDimensions.y);
-                config.startingPosition.y = j;
 
                 simulation.addParticle(config);
             }

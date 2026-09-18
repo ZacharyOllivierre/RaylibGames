@@ -8,6 +8,7 @@
 #include "graphics.h"
 
 #include "imguiWindow.h"
+#include "preset.h"
 
 Vector2 screenDimensions = {1200, 800};
 Vector2 worldDimensions = {5000, 5000};
@@ -27,6 +28,8 @@ int main()
     Controls controls(&simulation, config);
 
     Graphics graphics(simulation.getParticles());
+
+    Preset presets(simulation.getData());
 
     // Vulcan test
     VulkanCompute vulkan;
@@ -57,12 +60,13 @@ int main()
         DrawFPS(10, 10);
 
         rlImGuiBegin();
-        drawImGui(simulation, controls, graphics, worldDimensions);
+        // TODO make imgui class and save these to avoid passing every frame
+        drawImGui(simulation, controls, graphics, worldDimensions, presets);
         rlImGuiEnd();
 
         EndDrawing();
 
-        // Simulation
+        // CPU Simulation
         // simulation.updateParticles();
     }
 

@@ -7,17 +7,25 @@ Graphics::Graphics(std::vector<Particle> &particles)
 {
 }
 
+// TODO probably contributing most to lag
 void Graphics::draw()
 {
     // Draw particles
     for (const Particle &particle : particles)
     {
         const ParticleData &data = particle.getDataConst();
+        Color color = getParticleColor(particle.getDataConst().typeId);
 
         DrawCircleV(
             data.position,
             data.size,
-            getParticleColor(particle.getDataConst().typeId));
+            color);
+
+        // glow - slows it down too much to use
+        // DrawCircleV(
+        //     data.position,
+        //     data.size * 3.0f,
+        //     Fade(color, 0.05f));
     }
 }
 

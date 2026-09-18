@@ -6,6 +6,7 @@ SOURCES = \
 	src/graphics.cpp \
 	src/VulkanCompute.cpp \
 	src/imguiWindow.cpp \
+	src/preset.cpp \
     include/imgui/imgui.cpp \
     include/imgui/imgui_draw.cpp \
     include/imgui/imgui_tables.cpp \
