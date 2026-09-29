@@ -9,16 +9,16 @@ public:
     TextureManager()
     {
         playerShip = LoadTexture("assets/textures/playerShip.png");
-        enemyShip = LoadTexture("assets/textures/enemyShip.png");
+        bomberShip = LoadTexture("assets/textures/bomberShip.png");
     }
 
     ~TextureManager()
     {
         UnloadTexture(playerShip);
-        UnloadTexture(enemyShip);
+        UnloadTexture(bomberShip);
     }
 
 public:
     Texture2D playerShip;
-    Texture2D enemyShip;
+    Texture2D bomberShip;
 };

@@ -47,6 +47,8 @@ void Graphics::drawGame()
         {(float)gameWidth, 0},
         WHITE);
 
+    DrawFPS(10, 10);
+
     EndDrawing();
 }
 

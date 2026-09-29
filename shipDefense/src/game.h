@@ -31,7 +31,7 @@ private:
 
     void addEnemyShip(EnemyType type);
     Sprite getEnemyShipData(const EnemyType type, ShipData &data, FollowType &followType);
-    Vector2 getEnemySpawnLocation();
+    Vector2 getEnemySpawnLocation(int buffer);
 
 private:
     RenderManager *renderManager;

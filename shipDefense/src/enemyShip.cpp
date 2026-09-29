@@ -1,8 +1,8 @@
 #include "enemyShip.h"
 
 EnemyShip::EnemyShip(const ShipData &data, World &world, Sprite sprite,
-                     FollowType type, PlayerShip &pShip)
-    : Ship(data, world, sprite), followType(type), pShip(pShip)
+                     FollowType type, PlayerShip &pShip, EnemyType enemyType)
+    : Ship(data, world, sprite), enemyType(enemyType), followType(type), pShip(pShip)
 {
 }
 
@@ -15,35 +15,55 @@ void EnemyShip::update(float delta)
 
 void EnemyShip::applyFollowForce()
 {
-    Vector2 shipPos = Ship::getPosition();
-    Vector2 playerPos = pShip.getPosition();
+    float xForce = 0;
+    float yForce = 0;
 
     switch (followType)
     {
     case FollowType::Touch:
 
-        // x update
-        if (playerPos.x > shipPos.x)
-        {
-            addForce({data.speed, 0});
-        }
-        else
-        {
-            addForce({-data.speed, 0});
-        }
+        basicFollow(xForce, yForce);
+        break;
 
-        // y update
-        if (playerPos.y > shipPos.y)
+    // TODO replace the "random"
+    case FollowType::TouchRandom:
+        basicFollow(xForce, yForce);
+
+        if (GetRandomValue(0, 10) == 0)
         {
-            addForce({0, data.speed});
-        }
-        else
-        {
-            addForce({0, -data.speed});
+            xForce *= GetRandomValue(0, 2);
+            yForce *= GetRandomValue(0, 2);
         }
         break;
 
     default:
         return;
+    }
+
+    addForce({xForce, yForce});
+}
+
+void EnemyShip::basicFollow(float &xForce, float &yForce)
+{
+    Vector2 playerPos = pShip.getPosition();
+    Vector2 shipPos = Ship::getPosition();
+
+    // x update
+    if (playerPos.x > shipPos.x)
+    {
+        xForce = data.speed;
+    }
+    else
+    {
+        xForce = -data.speed;
+    }
+    // y update
+    if (playerPos.y > shipPos.y)
+    {
+        yForce = data.speed;
+    }
+    else
+    {
+        yForce = -data.speed;
     }
 }

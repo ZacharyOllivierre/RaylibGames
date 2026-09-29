@@ -6,10 +6,13 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
            World *world, Graphics *graphics, TextureManager *textureManager)
     : renderManager(renderManager),
       updateManager(updateManager),
-      world(world), graphics(graphics),
-      textureManager(textureManager)
+      textureManager(textureManager),
+      world(world), graphics(graphics)
 {
     initPlayerShip();
+    addEnemyShip(EnemyType::Bomber);
+    addEnemyShip(EnemyType::Bomber);
+    addEnemyShip(EnemyType::Bomber);
     addEnemyShip(EnemyType::Bomber);
 }
 
@@ -62,7 +65,7 @@ void Game::addEnemyShip(EnemyType type)
         *world,
         std::move(sprite),
         followType,
-        *ship);
+        *ship, type);
 
     EnemyShip *enemyPtr = enemy.get();
     enemyShips.push_back(std::move(enemy));
@@ -77,21 +80,55 @@ Sprite Game::getEnemyShipData(const EnemyType type, ShipData &data,
     switch (type)
     {
     case EnemyType::Bomber:
-        data.startingPosition = getEnemySpawnLocation();
+        data.startingPosition = getEnemySpawnLocation(32);
         data.hitBox = {data.startingPosition.x, data.startingPosition.y, 64, 64};
-        data.speed = 400.0f;
+        data.speed = 300.0f;
         data.rotation = 0.0f;
 
-        followType = FollowType::Touch;
+        followType = FollowType::TouchRandom;
 
-        return Sprite(textureManager->enemyShip);
+        return Sprite(textureManager->bomberShip);
 
     default:
         throw std::invalid_argument("Unsupported enemy type");
     }
 }
 
-Vector2 Game::getEnemySpawnLocation()
+Vector2 Game::getEnemySpawnLocation(int buffer)
 {
-    return {50, 50};
+    // TODO cleaner with enum
+    int wall = GetRandomValue(1, 4);
+    Vector2 dimensions = world->getDimensions();
+
+    // TODO creating "pos" in each if is terrible - error if pull out tho
+    // top
+    if (wall == 1)
+    {
+        Vector2 pos = {(float)GetRandomValue(buffer, dimensions.x - buffer),
+                       (float)buffer};
+        return pos;
+    }
+    // Bottom
+    if (wall == 3)
+    {
+        Vector2 pos = {(float)GetRandomValue(buffer, dimensions.x - buffer),
+                       dimensions.y - (float)buffer};
+        return pos;
+    }
+    // right
+    if (wall == 2)
+    {
+        Vector2 pos = {dimensions.x - buffer,
+                       (float)GetRandomValue(buffer, dimensions.y - buffer)};
+        return pos;
+    }
+    // left
+    if (wall == 4)
+    {
+        Vector2 pos = {(float)buffer,
+                       (float)GetRandomValue(buffer, dimensions.y - buffer)};
+        return pos;
+    }
+
+    return {0, 0};
 }
