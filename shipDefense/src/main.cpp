@@ -2,6 +2,7 @@
 
 #include "updateManager.h"
 #include "renderManager.h"
+#include "textureManager.h"
 
 #include "graphics.h"
 #include "world.h"
@@ -17,6 +18,7 @@ int main()
 
     UpdateManager updateManager;
     RenderManager renderManager;
+    TextureManager textureManager;
 
     World world(WORLD_SIZE);
 
@@ -25,7 +27,7 @@ int main()
                       WORLD_SIZE,
                       &renderManager);
 
-    Game game(&renderManager, &updateManager, &world, &graphics);
+    Game game(&renderManager, &updateManager, &world, &graphics, &textureManager);
     updateManager.add(&game);
 
     while (!WindowShouldClose())

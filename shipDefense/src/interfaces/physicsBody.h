@@ -1,6 +1,7 @@
 #pragma once
 
 #include "raylib.h"
+#include <cmath>
 
 class PhysicsBody
 {
@@ -15,8 +16,8 @@ public:
         velocity.y += acceleration.y * delta;
 
         // drag (not realistic but better controls)
-        velocity.x *= drag.x;
-        velocity.y *= drag.y;
+        velocity.x *= std::pow(drag.x, delta * 60.0f);
+        velocity.y *= std::pow(drag.y, delta * 60.0f);
 
         body.x += velocity.x * delta;
         body.y += velocity.y * delta;
@@ -39,6 +40,16 @@ public:
     Vector2 getVelocity() const
     {
         return velocity;
+    }
+
+    void setAcceleration(Vector2 acceleration)
+    {
+        this->acceleration = acceleration;
+    }
+
+    Vector2 getAcceleration() const
+    {
+        return acceleration;
     }
 
     Vector2 getPosition() const

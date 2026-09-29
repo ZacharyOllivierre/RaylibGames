@@ -1,13 +1,14 @@
 #include "graphics.h"
 
 #include "raymath.h"
+#include <algorithm>
 
 // sets game viewport as 75% and ui as 25%
 Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions, RenderManager *rManager)
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
-      gameWidth(static_cast<int>(windowDimensions.x * 0.75f)),
-      uiWidth(static_cast<int>(windowDimensions.x * 0.25f)),
+      gameWidth(std::max(1, static_cast<int>(windowDimensions.x * 0.75f))),
+      uiWidth(std::max(1, static_cast<int>(windowDimensions.x * 0.25f))),
       renderManager(rManager)
 {
     gameTexture = LoadRenderTexture(gameWidth, windowDimensions.y);
@@ -30,6 +31,7 @@ Graphics::~Graphics()
 void Graphics::drawGame()
 {
     buildGameTexture();
+
     buildUiTexture();
 
     BeginDrawing();
@@ -86,6 +88,14 @@ void Graphics::updateCamera(Vector2 target)
 
 void Graphics::buildGameTexture()
 {
+    // TraceLog(
+    //     LOG_INFO,
+    //     "gameTexture: id=%u, texture.id=%u, width=%d, height=%d",
+    //     gameTexture.id,
+    //     gameTexture.texture.id,
+    //     gameTexture.texture.width,
+    //     gameTexture.texture.height);
+
     BeginTextureMode(gameTexture);
 
     ClearBackground(BLACK);

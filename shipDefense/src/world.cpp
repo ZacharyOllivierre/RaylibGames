@@ -3,6 +3,8 @@
 #include "interfaces/physicsBody.h"
 #include "raymath.h"
 
+#include <algorithm>
+
 World::World(Vector2 dimensions)
     : dimensions(dimensions)
 {
@@ -15,8 +17,8 @@ void World::constrain(PhysicsBody &body)
     float minX = 0.0f;
     float minY = 0.0f;
 
-    float maxX = dimensions.x - bodyRect.width;
-    float maxY = dimensions.y - bodyRect.height;
+    float maxX = std::max(0.0f, dimensions.x - bodyRect.width);
+    float maxY = std::max(0.0f, dimensions.y - bodyRect.height);
 
     Vector2 position = body.getPosition();
 

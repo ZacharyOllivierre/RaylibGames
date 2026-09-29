@@ -8,10 +8,10 @@ class Sprite
 {
 public:
     // constructor for sprite sheet
-    Sprite(Texture2D texture, Rectangle source) : texture(texture), source(source) {}
+    Sprite(Texture2D &texture, Rectangle source) : texture(texture), source(source) {}
 
     // constructor for single sprite
-    Sprite(Texture2D texture)
+    Sprite(Texture2D &texture)
         : texture(texture),
           source{0, 0,
                  static_cast<float>(texture.width),
@@ -35,7 +35,7 @@ public:
             WHITE);
     }
 
-    void renderHitBox(Rectangle body)
+    void renderHitBox(Rectangle body) const
     {
         DrawRectangleLinesEx(
             body,
@@ -51,6 +51,6 @@ public:
     }
 
 private:
-    Texture2D texture;
+    Texture2D &texture;
     Rectangle source;
 };

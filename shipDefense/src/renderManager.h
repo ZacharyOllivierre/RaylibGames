@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "interfaces/renderable.h"
 #include <vector>
 
@@ -10,6 +11,10 @@ public:
 
     void add(Renderable *object)
     {
+        if (object == nullptr ||
+            std::find(objects.begin(), objects.end(), object) != objects.end())
+            return;
+
         objects.push_back(object);
     }
 
