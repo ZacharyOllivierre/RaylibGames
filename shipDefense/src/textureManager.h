@@ -10,6 +10,7 @@ public:
     {
         playerShip = LoadTexture("assets/textures/playerShip.png");
         bomberShip = LoadTexture("assets/textures/bomberShip.png");
+        gunnerShip = LoadTexture("assets/textures/gunnerShip.png");
     }
 
     ~TextureManager()
@@ -21,4 +22,5 @@ public:
 public:
     Texture2D playerShip;
     Texture2D bomberShip;
+    Texture2D gunnerShip;
 };

@@ -20,7 +20,6 @@ public:
 
 private:
     void buildGameTexture();
-    void buildUiTexture();
 
     void drawGameTestGrid();
 
@@ -29,10 +28,6 @@ private:
     Vector2 worldDimensions;
 
     RenderTexture2D gameTexture;
-    RenderTexture2D uiTexture;
-
-    int gameWidth;
-    int uiWidth;
 
     Camera2D camera;
 

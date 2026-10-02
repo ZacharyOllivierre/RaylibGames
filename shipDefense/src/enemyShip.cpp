@@ -36,8 +36,38 @@ void EnemyShip::applyFollowForce()
         }
         break;
 
-    default:
-        return;
+    case FollowType::Approach:
+
+        float approachDistance = 200;
+        Vector2 playerPos = pShip.getPosition();
+        Vector2 shipPos = Ship::getPosition();
+
+        float dx = playerPos.x - shipPos.x;
+        float dy = playerPos.y - shipPos.y;
+
+        float distanceSquared = dx * dx + dy * dy;
+
+        // approach to a point
+        if (distanceSquared > approachDistance * approachDistance)
+        {
+            basicFollow(xForce, yForce);
+        }
+        // back away within approach distance
+        else
+        {
+            float length = std::sqrt(distanceSquared);
+
+            if (length > 0.0f)
+            {
+                dx /= length;
+                dy /= length;
+
+                xForce = -dx * data.speed;
+                yForce = -dy * data.speed;
+            }
+        }
+
+        break;
     }
 
     addForce({xForce, yForce});
@@ -48,22 +78,18 @@ void EnemyShip::basicFollow(float &xForce, float &yForce)
     Vector2 playerPos = pShip.getPosition();
     Vector2 shipPos = Ship::getPosition();
 
-    // x update
-    if (playerPos.x > shipPos.x)
+    Vector2 direction = {playerPos.x - shipPos.x,
+                         playerPos.y - shipPos.y};
+
+    float length = std::sqrt(direction.x * direction.x +
+                             direction.y * direction.y);
+
+    if (length > 0.0f)
     {
-        xForce = data.speed;
+        direction.x /= length;
+        direction.y /= length;
     }
-    else
-    {
-        xForce = -data.speed;
-    }
-    // y update
-    if (playerPos.y > shipPos.y)
-    {
-        yForce = data.speed;
-    }
-    else
-    {
-        yForce = -data.speed;
-    }
+
+    xForce = direction.x * data.speed;
+    yForce = direction.y * data.speed;
 }

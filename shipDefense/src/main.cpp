@@ -1,6 +1,7 @@
 #include "raylib.h"
 
 #include "updateManager.h"
+#include "collisionManager.h"
 #include "renderManager.h"
 #include "textureManager.h"
 
@@ -17,6 +18,7 @@ int main()
     SetTargetFPS(60);
 
     UpdateManager updateManager;
+    CollisionManager collisionManager;
     RenderManager renderManager;
     TextureManager textureManager;
 
@@ -27,7 +29,8 @@ int main()
                       WORLD_SIZE,
                       &renderManager);
 
-    Game game(&renderManager, &updateManager, &world, &graphics, &textureManager);
+    Game game(&renderManager, &updateManager, &collisionManager, &world,
+              &graphics, &textureManager);
     updateManager.add(&game);
 
     while (!WindowShouldClose())
@@ -35,6 +38,8 @@ int main()
         float delta = GetFrameTime();
 
         updateManager.update(delta);
+        collisionManager.checkCollisions();
+        game.cleanupDestroyedShips();
 
         graphics.drawGame();
     }

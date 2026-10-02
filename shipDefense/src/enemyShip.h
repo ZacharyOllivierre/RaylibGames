@@ -7,12 +7,14 @@
 enum class EnemyType
 {
     Bomber,
+    Gunner,
 };
 
 enum class FollowType
 {
     Touch,
     TouchRandom,
+    Approach,
 };
 
 // TODO change to sub classes of types of enemies

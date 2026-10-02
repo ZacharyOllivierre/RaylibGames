@@ -9,6 +9,7 @@
 #include "enemyShip.h"
 #include "sprite.h"
 #include "renderManager.h"
+#include "collisionManager.h"
 #include "updateManager.h"
 #include "textureManager.h"
 #include "graphics.h"
@@ -20,11 +21,13 @@ class Game : public Updateable
 {
 public:
     Game(RenderManager *renderManager, UpdateManager *updateManager,
-         World *world, Graphics *graphics, TextureManager *textureManager);
+         CollisionManager *collisionManager, World *world, Graphics *graphics,
+         TextureManager *textureManager);
 
     ~Game();
 
     void update(float delta) override;
+    void cleanupDestroyedShips();
 
 private:
     void initPlayerShip();
@@ -36,6 +39,7 @@ private:
 private:
     RenderManager *renderManager;
     UpdateManager *updateManager;
+    CollisionManager *collisionManager;
     TextureManager *textureManager;
     World *world;
     Graphics *graphics;

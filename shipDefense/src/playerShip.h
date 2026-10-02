@@ -11,6 +11,16 @@ public:
 
     void update(float delta) override;
 
+    bool isCollisionImmovable() const override
+    {
+        return true;
+    }
+
+    bool isPlayerShip() const override
+    {
+        return true;
+    }
+
 private:
     void shipInputControls();
 

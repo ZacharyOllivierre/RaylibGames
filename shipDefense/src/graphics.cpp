@@ -7,17 +7,14 @@
 Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions, RenderManager *rManager)
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
-      gameWidth(std::max(1, static_cast<int>(windowDimensions.x * 0.75f))),
-      uiWidth(std::max(1, static_cast<int>(windowDimensions.x * 0.25f))),
       renderManager(rManager)
 {
-    gameTexture = LoadRenderTexture(gameWidth, windowDimensions.y);
-    uiTexture = LoadRenderTexture(uiWidth, windowDimensions.y);
+    gameTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
 
     // init camera
     camera = {
-        {gameWidth / 2.0f, windowDimensions.y / 2.0f},
-        {gameWidth / 2.0f, windowDimensions.y / 2.0f},
+        {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
+        {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
         0.0f,
         1.0f};
 };
@@ -25,27 +22,18 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions, RenderMana
 Graphics::~Graphics()
 {
     UnloadRenderTexture(gameTexture);
-    UnloadRenderTexture(uiTexture);
 }
 
 void Graphics::drawGame()
 {
     buildGameTexture();
 
-    buildUiTexture();
-
     BeginDrawing();
 
     DrawTextureRec(gameTexture.texture,
-                   {0, 0, (float)gameWidth, -windowDimensions.y},
+                   {0, 0, windowDimensions.x, -windowDimensions.y},
                    {0, 0},
                    WHITE);
-
-    DrawTextureRec(
-        uiTexture.texture,
-        {0, 0, (float)uiWidth, -windowDimensions.y},
-        {(float)gameWidth, 0},
-        WHITE);
 
     DrawFPS(10, 10);
 
@@ -59,11 +47,11 @@ Camera2D &Graphics::getCamera()
 
 void Graphics::updateCamera(Vector2 target)
 {
-    float halfWidth = gameWidth / 2.0f;
+    float halfWidth = windowDimensions.x / 2.0f;
     float halfHeight = windowDimensions.y / 2.0f;
 
     // if the world is smaller than the viewport keep the camera centered on the world
-    if (worldDimensions.x <= gameWidth)
+    if (worldDimensions.x <= windowDimensions.x)
     {
         camera.target.x = worldDimensions.x / 2.0f;
     }
@@ -90,14 +78,6 @@ void Graphics::updateCamera(Vector2 target)
 
 void Graphics::buildGameTexture()
 {
-    // TraceLog(
-    //     LOG_INFO,
-    //     "gameTexture: id=%u, texture.id=%u, width=%d, height=%d",
-    //     gameTexture.id,
-    //     gameTexture.texture.id,
-    //     gameTexture.texture.width,
-    //     gameTexture.texture.height);
-
     BeginTextureMode(gameTexture);
 
     ClearBackground(BLACK);
@@ -108,15 +88,6 @@ void Graphics::buildGameTexture()
     renderManager->render();
 
     EndMode2D();
-
-    EndTextureMode();
-}
-
-void Graphics::buildUiTexture()
-{
-    BeginTextureMode(uiTexture);
-
-    ClearBackground(SKYBLUE);
 
     EndTextureMode();
 }
