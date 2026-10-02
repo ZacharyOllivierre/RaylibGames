@@ -55,6 +55,8 @@ void Game::cleanupDestroyedShips()
         updateManager->remove(enemy->get());
         collisionManager->remove(enemy->get());
         enemy = enemyShips.erase(enemy);
+
+        // TODO implement ship death ramifications
     }
 
     if (ship->isDead())

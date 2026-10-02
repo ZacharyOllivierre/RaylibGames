@@ -4,10 +4,12 @@
 #include <algorithm>
 
 // sets game viewport as 75% and ui as 25%
-Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions, RenderManager *rManager)
+Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
+                   RenderManager *rManager, TextureManager *textureManager)
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
-      renderManager(rManager)
+      renderManager(rManager),
+      textureManager(textureManager)
 {
     gameTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
 
@@ -84,7 +86,15 @@ void Graphics::buildGameTexture()
 
     BeginMode2D(camera);
 
-    drawGameTestGrid();
+    Texture2D *stars = &textureManager->starBackground;
+    DrawTexturePro(*stars,
+                   {0, 0, (float)stars->width, (float)stars->height},
+                   {0, 0, worldDimensions.x, worldDimensions.y},
+                   {0, 0},
+                   0.0f,
+                   WHITE);
+
+    // drawGameTestGrid();
     renderManager->render();
 
     EndMode2D();

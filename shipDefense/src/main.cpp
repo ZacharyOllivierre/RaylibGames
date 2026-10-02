@@ -27,7 +27,7 @@ int main()
     Graphics graphics({(float)GetScreenWidth(),
                        (float)GetScreenHeight()},
                       WORLD_SIZE,
-                      &renderManager);
+                      &renderManager, &textureManager);
 
     Game game(&renderManager, &updateManager, &collisionManager, &world,
               &graphics, &textureManager);

@@ -3,13 +3,15 @@
 #include "raylib.h"
 
 #include "renderManager.h"
+#include "textureManager.h"
 
 class Graphics
 {
 public:
     Graphics(Vector2 windowDimensions,
              Vector2 worldDimensions,
-             RenderManager *rManager);
+             RenderManager *rManager,
+             TextureManager *textureManager);
 
     ~Graphics();
 
@@ -32,4 +34,5 @@ private:
     Camera2D camera;
 
     RenderManager *renderManager;
+    TextureManager *textureManager;
 };
