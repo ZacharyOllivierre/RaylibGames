@@ -1,10 +1,11 @@
 SOURCES = \
 	src/main.cpp \
-	src/playerShip.cpp \
+	src/ships/ship.cpp \
+	src/ships/playerShip.cpp \
+	src/ships/enemyShip.cpp \
 	src/graphics.cpp \
 	src/world.cpp \
-	src/game.cpp \
-	src/enemyShip.cpp \
+	src/game.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXEC    = ex

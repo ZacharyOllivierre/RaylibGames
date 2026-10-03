@@ -1,7 +1,5 @@
 #include "game.h"
 
-#include <stdexcept>
-
 Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
            CollisionManager *collisionManager, World *world, Graphics *graphics,
            TextureManager *textureManager)
@@ -9,19 +7,22 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
       updateManager(updateManager),
       collisionManager(collisionManager),
       textureManager(textureManager),
-      world(world), graphics(graphics)
+      world(world), graphics(graphics),
+      projectileManager(*renderManager, *updateManager, *collisionManager)
 {
     initPlayerShip();
-    addEnemyShip(EnemyType::Bomber);
-    addEnemyShip(EnemyType::Bomber);
-    addEnemyShip(EnemyType::Bomber);
-    addEnemyShip(EnemyType::Gunner);
-    addEnemyShip(EnemyType::Gunner);
-    addEnemyShip(EnemyType::Gunner);
+    addBomberShip();
+    addBomberShip();
+    addBomberShip();
+    addGunnerShip();
+    addGunnerShip();
+    addGunnerShip();
 }
 
 Game::~Game()
 {
+    projectileManager.clear();
+
     for (const auto &enemy : enemyShips)
     {
         renderManager->remove(enemy.get());
@@ -39,13 +40,16 @@ Game::~Game()
 void Game::update(float delta)
 {
     graphics->updateCamera(ship->getPosition());
+
+    cleanupDestroyedShips();
+    projectileManager.cleanup();
 }
 
 void Game::cleanupDestroyedShips()
 {
     for (auto enemy = enemyShips.begin(); enemy != enemyShips.end();)
     {
-        if (!(*enemy)->isDead())
+        if (!(*enemy)->isDead() || !(*enemy)->isDestructionComplete())
         {
             ++enemy;
             continue;
@@ -61,82 +65,58 @@ void Game::cleanupDestroyedShips()
 
     if (ship->isDead())
     {
+        renderManager->remove(ship.get());
+        updateManager->remove(ship.get());
+        collisionManager->remove(ship.get());
+
         // TODO implement player death
     }
 }
 
 void Game::initPlayerShip()
 {
-    ShipData shipData{
-        {100, 100},
-        {100, 100, 64, 64},
-        1000.0f,
-        0.0f};
-
-    Sprite shipSprite(textureManager->playerShip);
+    ShipData shipData{{100, 100}, {36, 36}, {48, 48}, 1000.0f, 0.0f, 100.0f, 1.0f};
 
     ship = std::make_unique<PlayerShip>(
         shipData,
         *world,
-        std::move(shipSprite));
+        textureManager->playerVisuals,
+        textureManager->pelletAtlas,
+        projectileManager.getSpawner());
 
     updateManager->add(ship.get());
     renderManager->add(ship.get());
     collisionManager->add(ship.get());
 }
 
-void Game::addEnemyShip(EnemyType type)
+void Game::addBomberShip()
 {
-    ShipData data;
-    FollowType followType;
-    Sprite sprite = getEnemyShipData(type, data, followType);
+    Vector2 position = getEnemySpawnLocation(32);
+    ShipData data{position, {64, 64}, {64, 64}, 700.0f, 0.0f, 50.0f, 0.5f};
+    addEnemyShip(std::make_unique<BomberShip>(data, *world,
+                                              *ship,
+                                              textureManager->bomberVisuals,
+                                              projectileManager.getSpawner()));
+}
 
-    auto enemy = std::make_unique<EnemyShip>(
-        data,
-        *world,
-        std::move(sprite),
-        followType,
-        *ship, type);
+void Game::addGunnerShip()
+{
+    Vector2 position = getEnemySpawnLocation(16);
+    ShipData data{position, {64, 64}, {64, 64}, 600.0f, 0.0f, 100.0f, 0.6f};
+    addEnemyShip(std::make_unique<GunnerShip>(data, *world,
+                                              *ship,
+                                              textureManager->fighterVisuals,
+                                              projectileManager.getSpawner()));
+}
 
+void Game::addEnemyShip(std::unique_ptr<EnemyShip> enemy)
+{
     EnemyShip *enemyPtr = enemy.get();
     enemyShips.push_back(std::move(enemy));
 
     updateManager->add(enemyPtr);
     renderManager->add(enemyPtr);
     collisionManager->add(enemyPtr);
-}
-
-// TODO doesnt belong here
-Sprite Game::getEnemyShipData(const EnemyType type, ShipData &data,
-                              FollowType &followType)
-{
-    switch (type)
-    {
-    case EnemyType::Bomber:
-        data.startingPosition = getEnemySpawnLocation(32);
-        data.hitBox = {data.startingPosition.x, data.startingPosition.y, 64, 64};
-        data.speed = 700.0f;
-        data.rotation = 0.0f;
-        data.health = 1000;
-
-        followType = FollowType::TouchRandom;
-
-        return Sprite(textureManager->bomberShip);
-
-    case EnemyType::Gunner:
-        data.startingPosition = getEnemySpawnLocation(16);
-        data.hitBox = {data.startingPosition.x, data.startingPosition.y, 80, 80};
-        data.speed = 600.0f;
-        data.rotation = 0.0f;
-        data.health = 1000;
-
-        followType = FollowType::Approach;
-
-        return Sprite(textureManager->gunnerShip);
-
-    default:
-        throw std::invalid_argument("Unsupported enemy type");
-    }
 }
 
 Vector2 Game::getEnemySpawnLocation(int buffer)

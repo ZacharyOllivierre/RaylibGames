@@ -4,17 +4,15 @@
 
 #include "ship.h"
 
+class Atlas;
+
 class PlayerShip : public Ship
 {
 public:
-    PlayerShip(const ShipData &data, World &world, Sprite sprite);
+    PlayerShip(const ShipData &data, World &world, const ShipVisuals &visuals,
+               Atlas &projectileAtlas, ProjectileSpawner projectileSpawner);
 
     void update(float delta) override;
-
-    bool isCollisionImmovable() const override
-    {
-        return true;
-    }
 
     bool isPlayerShip() const override
     {
@@ -23,6 +21,7 @@ public:
 
 private:
     void shipInputControls();
+    void fireProjectile();
 
-private:
+    Atlas &projectileAtlas;
 };

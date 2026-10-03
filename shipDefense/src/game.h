@@ -5,9 +5,10 @@
 
 #include "interfaces/updateable.h"
 
-#include "playerShip.h"
-#include "enemyShip.h"
-#include "sprite.h"
+#include "ships/playerShip.h"
+#include "ships/bomberShip.h"
+#include "ships/gunnerShip.h"
+#include "projectiles/projectileManager.h"
 #include "renderManager.h"
 #include "collisionManager.h"
 #include "updateManager.h"
@@ -32,8 +33,9 @@ public:
 private:
     void initPlayerShip();
 
-    void addEnemyShip(EnemyType type);
-    Sprite getEnemyShipData(const EnemyType type, ShipData &data, FollowType &followType);
+    void addBomberShip();
+    void addGunnerShip();
+    void addEnemyShip(std::unique_ptr<EnemyShip> enemy);
     Vector2 getEnemySpawnLocation(int buffer);
 
 private:
@@ -43,7 +45,9 @@ private:
     TextureManager *textureManager;
     World *world;
     Graphics *graphics;
+    ProjectileManager projectileManager;
 
+    // TODO ship manager
     std::unique_ptr<PlayerShip> ship;
     std::vector<std::unique_ptr<EnemyShip>> enemyShips;
 };

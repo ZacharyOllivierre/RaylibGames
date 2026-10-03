@@ -1,6 +1,6 @@
 #pragma once
 
-class Collidable;
+class Damageable;
 
 enum class DamageType
 {
@@ -12,13 +12,18 @@ struct DamageEvent
 {
     float amount;
     DamageType type;
-    Collidable *source;
+    Damageable *source;
 };
 
 class Damageable
 {
 public:
     virtual ~Damageable() = default;
+
+    void dealDamage(Damageable &target, float amount, DamageType type)
+    {
+        target.takeDamage({amount, type, this});
+    }
 
     virtual void takeDamage(const DamageEvent &damage) = 0;
 };

@@ -52,8 +52,7 @@ public:
     }
 
 private:
-    static CollisionContact getContact(Rectangle first,
-                                       Rectangle second)
+    static CollisionContact getContact(Rectangle first, Rectangle second)
     {
         float overlapX = std::min(first.x + first.width,
                                   second.x + second.width) -

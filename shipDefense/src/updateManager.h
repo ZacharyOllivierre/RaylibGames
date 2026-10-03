@@ -21,8 +21,8 @@ public:
 
     void update(float delta)
     {
-        for (Updateable *object : objects)
-            object->update(delta);
+        for (std::size_t index = 0; index < objects.size(); index++)
+            objects[index]->update(delta);
     }
 
     void remove(Updateable *object)

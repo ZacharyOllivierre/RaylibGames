@@ -12,6 +12,13 @@
 const Vector2 WORLD_SIZE = {2500, 2500};
 const Vector2 WINDOW_SIZE = {1300, 800};
 
+// TODO doesnt bleong here
+enum class Scene
+{
+    MainMenu,
+    Game,
+};
+
 int main()
 {
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Ship Defender or Something");
@@ -33,15 +40,27 @@ int main()
               &graphics, &textureManager);
     updateManager.add(&game);
 
+    // Scene scene = Scene::MainMenu;
+
     while (!WindowShouldClose())
     {
+
         float delta = GetFrameTime();
 
         updateManager.update(delta);
         collisionManager.checkCollisions();
-        game.cleanupDestroyedShips();
-
         graphics.drawGame();
+
+        // switch (scene)
+        // {
+        // case Scene::MainMenu:
+        //     graphics
+        //     break;
+        // case Scene::Game:
+
+        // TODO implement game loop and reseting for scene switching
+        // break;
+        // }
     }
 
     CloseWindow();
