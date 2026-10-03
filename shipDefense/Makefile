@@ -3,9 +3,11 @@ SOURCES = \
 	src/ships/ship.cpp \
 	src/ships/playerShip.cpp \
 	src/ships/enemyShip.cpp \
+	src/ships/shipManager.cpp \
 	src/graphics.cpp \
 	src/world.cpp \
-	src/game.cpp
+	src/game.cpp \
+	src/waveSpawner.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 EXEC    = ex

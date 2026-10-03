@@ -5,18 +5,17 @@
 
 #include "interfaces/updateable.h"
 
-#include "ships/playerShip.h"
-#include "ships/bomberShip.h"
-#include "ships/gunnerShip.h"
+#include "ships/shipManager.h"
 #include "projectiles/projectileManager.h"
 #include "renderManager.h"
 #include "collisionManager.h"
 #include "updateManager.h"
 #include "textureManager.h"
 #include "graphics.h"
+#include "waveSpawner.h"
+#include "sceneTypes.h"
 
 // TODO
-// textures being stored in the ships themselves is a problem for unloading
 
 class Game : public Updateable
 {
@@ -28,26 +27,19 @@ public:
     ~Game();
 
     void update(float delta) override;
-    void cleanupDestroyedShips();
+
+    void startRound();
+    void resetGame();
+    GameResult getResult() const;
 
 private:
     void initPlayerShip();
 
-    void addBomberShip();
-    void addGunnerShip();
-    void addEnemyShip(std::unique_ptr<EnemyShip> enemy);
-    Vector2 getEnemySpawnLocation(int buffer);
-
 private:
-    RenderManager *renderManager;
-    UpdateManager *updateManager;
-    CollisionManager *collisionManager;
-    TextureManager *textureManager;
     World *world;
     Graphics *graphics;
     ProjectileManager projectileManager;
-
-    // TODO ship manager
-    std::unique_ptr<PlayerShip> ship;
-    std::vector<std::unique_ptr<EnemyShip>> enemyShips;
+    ShipManager shipManager;
+    WaveSpawner waveSpawner;
+    GameResult result;
 };

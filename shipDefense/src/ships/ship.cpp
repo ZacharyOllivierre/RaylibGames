@@ -133,5 +133,6 @@ void Ship::render()
             visuals.engines.getFrame(animationTime, engineFramesPerSecond));
     }
 
+    // TODO debug hitbox draw
     DrawRectangleLinesEx(body, 2.0f, RED);
 }

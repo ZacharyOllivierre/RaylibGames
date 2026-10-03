@@ -19,9 +19,9 @@ public:
 
     void checkCollisions()
     {
-        for (int first = 0; first < objects.size(); first++)
+        for (size_t first = 0; first < objects.size(); first++)
         {
-            for (int second = first + 1; second < objects.size(); second++)
+            for (size_t second = first + 1; second < objects.size(); second++)
             {
                 Collidable *firstObject = objects[first];
                 Collidable *secondObject = objects[second];

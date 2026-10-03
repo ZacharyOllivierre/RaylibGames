@@ -9,15 +9,10 @@
 #include "world.h"
 #include "game.h"
 
+#include "sceneTypes.h"
+
 const Vector2 WORLD_SIZE = {2500, 2500};
 const Vector2 WINDOW_SIZE = {1300, 800};
-
-// TODO doesnt bleong here
-enum class Scene
-{
-    MainMenu,
-    Game,
-};
 
 int main()
 {
@@ -40,27 +35,45 @@ int main()
               &graphics, &textureManager);
     updateManager.add(&game);
 
-    // Scene scene = Scene::MainMenu;
+    Scene scene = Scene::MainMenu;
 
     while (!WindowShouldClose())
     {
 
-        float delta = GetFrameTime();
+        graphics.draw(scene, game.getResult());
 
-        updateManager.update(delta);
-        collisionManager.checkCollisions();
-        graphics.drawGame();
+        switch (scene)
+        {
+        case Scene::MainMenu:
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                game.resetGame();
+                scene = Scene::Game;
+            }
+            break;
 
-        // switch (scene)
-        // {
-        // case Scene::MainMenu:
-        //     graphics
-        //     break;
-        // case Scene::Game:
+        case Scene::Game:
+        {
+            float delta = GetFrameTime();
+            updateManager.update(delta);
+            collisionManager.checkCollisions();
 
-        // TODO implement game loop and reseting for scene switching
-        // break;
-        // }
+            if (game.getResult() != GameResult::InProgress)
+                scene = Scene::GameOver;
+
+            break;
+        }
+
+        case Scene::GameOver:
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                // duplicate
+                game.resetGame();
+                scene = Scene::MainMenu;
+            }
+
+            break;
+        }
     }
 
     CloseWindow();

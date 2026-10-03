@@ -12,6 +12,8 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
       textureManager(textureManager)
 {
     gameTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
+    mainMenuTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
+    gameOverTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
 
     // init camera
     camera = {
@@ -24,22 +26,24 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
 Graphics::~Graphics()
 {
     UnloadRenderTexture(gameTexture);
+    UnloadRenderTexture(mainMenuTexture);
+    UnloadRenderTexture(gameOverTexture);
 }
 
-void Graphics::drawGame()
+void Graphics::draw(const Scene &scene, GameResult result)
 {
-    buildGameTexture();
-
-    BeginDrawing();
-
-    DrawTextureRec(gameTexture.texture,
-                   {0, 0, windowDimensions.x, -windowDimensions.y},
-                   {0, 0},
-                   WHITE);
-
-    DrawFPS(10, 10);
-
-    EndDrawing();
+    switch (scene)
+    {
+    case Scene::MainMenu:
+        drawMainMenu();
+        break;
+    case Scene::Game:
+        drawGame();
+        break;
+    case Scene::GameOver:
+        drawGameOver(result);
+        break;
+    }
 }
 
 Camera2D &Graphics::getCamera()
@@ -78,6 +82,22 @@ void Graphics::updateCamera(Vector2 target)
     }
 }
 
+void Graphics::drawGame()
+{
+    buildGameTexture();
+
+    BeginDrawing();
+
+    DrawTextureRec(gameTexture.texture,
+                   {0, 0, windowDimensions.x, -windowDimensions.y},
+                   {0, 0},
+                   WHITE);
+
+    DrawFPS(10, 10);
+
+    EndDrawing();
+}
+
 void Graphics::buildGameTexture()
 {
     BeginTextureMode(gameTexture);
@@ -98,6 +118,71 @@ void Graphics::buildGameTexture()
     renderManager->render();
 
     EndMode2D();
+
+    EndTextureMode();
+}
+
+void Graphics::drawMainMenu()
+{
+    buildMainMenu();
+
+    BeginDrawing();
+
+    DrawTextureRec(mainMenuTexture.texture,
+                   {0, 0, windowDimensions.x, -windowDimensions.y},
+                   {0, 0},
+                   WHITE);
+    EndDrawing();
+}
+
+void Graphics::buildMainMenu()
+{
+    BeginTextureMode(mainMenuTexture);
+    ClearBackground(BLACK);
+
+    int fontSize = 150;
+    char text[] = "Game";
+
+    DrawText(text, windowDimensions.x / 2 - MeasureText(text, fontSize) / 2,
+             windowDimensions.y / 2 - fontSize, fontSize, RED);
+
+    char subText[] = "Press Space to Continue";
+    int subFontSize = 60;
+    DrawText(subText, windowDimensions.x / 2 - MeasureText(subText, subFontSize) / 2,
+             windowDimensions.y * 0.75 - subFontSize, subFontSize, WHITE);
+
+    EndTextureMode();
+}
+
+void Graphics::drawGameOver(GameResult result)
+{
+    buildGameOver(result);
+
+    BeginDrawing();
+
+    DrawTextureRec(gameOverTexture.texture,
+                   {0, 0, windowDimensions.x, -windowDimensions.y},
+                   {0, 0},
+                   WHITE);
+    EndDrawing();
+}
+
+void Graphics::buildGameOver(GameResult result)
+{
+    BeginTextureMode(gameOverTexture);
+    ClearBackground(BLACK);
+
+    const char *text = result == GameResult::Win ? "Win" : "Lose";
+    const int fontSize = 150;
+    DrawText(text, windowDimensions.x / 2 - MeasureText(text, fontSize) / 2,
+             windowDimensions.y / 2 - fontSize, fontSize,
+             result == GameResult::Win ? GREEN : RED);
+
+    const char *subText = "Press Space to Restart";
+    const int subFontSize = 60;
+    DrawText(subText,
+             windowDimensions.x / 2 - MeasureText(subText, subFontSize) / 2,
+             windowDimensions.y * 0.75 - subFontSize, subFontSize, WHITE);
 
     EndTextureMode();
 }
