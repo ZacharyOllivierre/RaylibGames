@@ -26,7 +26,7 @@ struct ShipData
     float speed = 0.0f;
     float rotation = 0.0f;
     float health = 100.0f;
-    float contactDamage = 1.0f;
+    float contactDamage = 0.0f;
     float maxHealth = 0.0f;
     bool wrapAtEdges = false;
 };

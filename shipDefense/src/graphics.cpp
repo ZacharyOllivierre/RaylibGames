@@ -8,7 +8,7 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
                    RenderManager *rManager, TextureManager *textureManager)
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
-      renderDimensions({640, 360}),
+      renderDimensions({854, 480}),
       renderManager(rManager),
       textureManager(textureManager),
       bloom(LoadShader(nullptr, "src/shader/bloom.fs")),
@@ -26,12 +26,12 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
         {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
         {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
         0.0f,
-        0.7f};
+        0.8f};
 
     // font
     gameFont = LoadFontEx(
         "assets/fonts/Doom2016.ttf",
-        480,
+        450,
         nullptr,
         0);
 
@@ -221,7 +221,7 @@ void Graphics::buildMainMenu()
     ClearBackground(BLACK);
 
     const char *titleText = "ShipS AnD StufF";
-    const int titleFontSize = 300;
+    const int titleFontSize = 450;
     const float titleSpacing = 3.0f;
 
     Vector2 titleSize = MeasureTextEx(
@@ -246,7 +246,7 @@ void Graphics::buildMainMenu()
     if (mainMenuSubTimer <= 4)
     {
         char subText[] = "press space to continue";
-        int subFontSize = 120;
+        int subFontSize = 180;
         int spacing = 1;
 
         DrawDoubleText(
@@ -327,9 +327,9 @@ void Graphics::buildGameOver(GameResult result)
 
 void Graphics::drawHud(const GameView &view)
 {
-    const int fontSize = 80;
-    const int barWidth = 300;
-    const int barHeight = 28;
+    const int fontSize = 180;
+    const int barWidth = 400;
+    const int barHeight = 30;
     const float healthRatio = view.playerMaxHealth > 0.0f
                                   ? view.playerHealth / view.playerMaxHealth
                                   : 0.0f;
@@ -389,18 +389,11 @@ void Graphics::DrawDoubleText(Font font, const char *text, Vector2 position, flo
     frontColor = Fade(frontColor, alpha);
 
     DrawTextEx(
-        font,
-        text,
+        font, text,
         {position.x + offset.x, position.y + offset.y},
-        fontSize,
-        spacing,
-        backColor);
+        fontSize, spacing, backColor);
 
     DrawTextEx(
-        font,
-        text,
-        position,
-        fontSize,
-        spacing,
-        frontColor);
+        font, text, position, fontSize,
+        spacing, frontColor);
 }

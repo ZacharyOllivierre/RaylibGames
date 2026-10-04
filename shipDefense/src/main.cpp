@@ -12,11 +12,16 @@
 #include "sceneTypes.h"
 
 const Vector2 WORLD_SIZE = {2500, 2500};
-const Vector2 WINDOW_SIZE = {1300, 800};
+Vector2 WINDOW_SIZE = {1500, 900};
 
 int main()
 {
-    InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Ship Defender or Something");
+
+    InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Ships And Stuff");
+    ToggleFullscreen();
+
+    WINDOW_SIZE = {(float)GetScreenWidth(), (float)GetScreenHeight()};
+
     SetTargetFPS(60);
 
     UpdateManager updateManager;
@@ -26,8 +31,7 @@ int main()
 
     World world(WORLD_SIZE);
 
-    Graphics graphics({(float)GetScreenWidth(),
-                       (float)GetScreenHeight()},
+    Graphics graphics(WINDOW_SIZE,
                       WORLD_SIZE,
                       &renderManager, &textureManager);
 

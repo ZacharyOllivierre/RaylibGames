@@ -68,7 +68,7 @@ ShipData WaveSpawner::calculateShipStats(ShipManager::ShipType shipType)
         data.startingPosition = getEnemySpawnLocation();
         data.hitBoxSize = {60, 60};
         data.textureSize = {90, 90};
-        data.speed = 500.0f + (progression * 60);
+        data.speed = 400.0f * (progression) / 2;
         data.health = 50.0f + (progression * 8);
         data.contactDamage = 0.5f;
         data.wrapAtEdges = true;
@@ -78,7 +78,7 @@ ShipData WaveSpawner::calculateShipStats(ShipManager::ShipType shipType)
         data.startingPosition = getEnemySpawnLocation();
         data.hitBoxSize = {60, 60};
         data.textureSize = {90, 90};
-        data.speed = 400.0f + (progression * 60);
+        data.speed = 300.0f * (progression) / 2;
         data.health = 100.0f + (progression * 8);
         data.contactDamage = 0.6f;
         data.wrapAtEdges = true;

@@ -81,8 +81,6 @@ void ShipManager::cleanupDestroyedShips()
     if (playerShip && playerShip->isDead())
     {
         unregisterShip(*playerShip);
-
-        // TODO implement player death
     }
 }
 

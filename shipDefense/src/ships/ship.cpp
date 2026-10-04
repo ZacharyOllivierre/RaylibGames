@@ -13,7 +13,7 @@ Ship::Ship(ShipData data, World &world, const ShipVisuals &visuals,
                    data.startingPosition.y,
                    data.hitBoxSize.x,
                    data.hitBoxSize.y},
-                  {0.99f, 0.99f}),
+                  {0.991f, 0.991f}),
       data(data),
       world(world),
       visuals(visuals),
@@ -141,5 +141,5 @@ void Ship::render()
     }
 
     // TODO debug hitbox draw
-    DrawRectangleLinesEx(body, 2.0f, RED);
+    // DrawRectangleLinesEx(body, 2.0f, RED);
 }
