@@ -8,22 +8,25 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
                    RenderManager *rManager, TextureManager *textureManager)
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
+      renderDimensions({640, 360}),
       renderManager(rManager),
       textureManager(textureManager),
+      bloom(LoadShader(nullptr, "src/shader/bloom.fs")),
       mainMenuTimer(0),
       mainMenuSubTimer(0),
       starRotation(0)
 {
-    gameTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
+    gameTexture = LoadRenderTexture(renderDimensions.x, renderDimensions.y);
     mainMenuTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
     gameOverTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
+    hudTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
 
     // init camera
     camera = {
-        {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
-        {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
+        {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
+        {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
         0.0f,
-        1.2f};
+        0.7f};
 
     // font
     gameFont = LoadFontEx(
@@ -31,8 +34,9 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
         480,
         nullptr,
         0);
-    // helps with font grainyness
+
     SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(gameTexture.texture, TEXTURE_FILTER_POINT);
 };
 
 Graphics::~Graphics()
@@ -40,8 +44,11 @@ Graphics::~Graphics()
     UnloadRenderTexture(gameTexture);
     UnloadRenderTexture(mainMenuTexture);
     UnloadRenderTexture(gameOverTexture);
+    UnloadRenderTexture(hudTexture);
 
     UnloadFont(gameFont);
+
+    UnloadShader(bloom);
 }
 
 void Graphics::draw(const Scene &scene, const GameView &view)
@@ -67,11 +74,11 @@ Camera2D &Graphics::getCamera()
 
 void Graphics::updateCamera(Vector2 target)
 {
-    float halfWidth = windowDimensions.x / (2.0f * camera.zoom);
-    float halfHeight = windowDimensions.y / (2.0f * camera.zoom);
+    float halfWidth = renderDimensions.x / (2.0f * camera.zoom);
+    float halfHeight = renderDimensions.y / (2.0f * camera.zoom);
 
     // if the world is smaller than the viewport keep the camera centered on the world
-    if (worldDimensions.x <= windowDimensions.x)
+    if (worldDimensions.x <= renderDimensions.x)
     {
         camera.target.x = worldDimensions.x / 2.0f;
     }
@@ -83,7 +90,7 @@ void Graphics::updateCamera(Vector2 target)
             worldDimensions.x - halfWidth);
     }
 
-    if (worldDimensions.y <= windowDimensions.y)
+    if (worldDimensions.y <= renderDimensions.y)
     {
         camera.target.y = worldDimensions.y / 2.0f;
     }
@@ -101,7 +108,7 @@ void Graphics::updateTimers(const Scene &scene, float delta)
     if (scene == Scene::MainMenu)
     {
         if (mainMenuTimer <= 255)
-            mainMenuTimer += delta / 2;
+            mainMenuTimer += delta / 2.5;
 
         if (mainMenuSubTimer <= 6)
             mainMenuSubTimer += delta * 4;
@@ -116,7 +123,7 @@ void Graphics::updateTimers(const Scene &scene, float delta)
         }
         else
         {
-            starRotation += delta;
+            starRotation += delta * 4;
         }
     }
     else if (scene == Scene::GameOver)
@@ -127,53 +134,32 @@ void Graphics::updateTimers(const Scene &scene, float delta)
 void Graphics::drawGame(const GameView &view)
 {
     updateCamera(view.cameraTarget);
+
+    // build
     buildGameTexture();
+    buildHud(view);
 
     BeginDrawing();
+    ClearBackground(BLACK);
 
-    DrawTextureRec(gameTexture.texture,
+    BeginShaderMode(bloom);
+
+    DrawTexturePro(
+        gameTexture.texture,
+        {0, 0,
+         (float)gameTexture.texture.width, -(float)gameTexture.texture.height},
+        {0, 0, windowDimensions.x, windowDimensions.y},
+        {0, 0}, 0.0f, WHITE);
+
+    EndShaderMode();
+
+    DrawTextureRec(hudTexture.texture,
                    {0, 0, windowDimensions.x, -windowDimensions.y},
                    {0, 0},
                    WHITE);
 
-    drawHud(view);
-    DrawFPS(10, 10);
-
+    // DrawFPS(10, 10);
     EndDrawing();
-}
-
-void Graphics::drawHud(const GameView &view)
-{
-    const int fontSize = 80;
-    const int barWidth = 300;
-    const int barHeight = 28;
-    const float healthRatio = view.playerMaxHealth > 0.0f
-                                  ? view.playerHealth / view.playerMaxHealth
-                                  : 0.0f;
-
-    int healthEdgeBuffer = 30;
-    int hudUiY = 20;
-    int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
-
-    DrawDoubleText(
-        gameFont,
-        TextFormat("RounD %d / %d", view.currentRound, view.maxRounds),
-        {static_cast<float>(healthEdgeBuffer), static_cast<float>(hudUiY)},
-        fontSize,
-        1.0f,
-        RED,
-        WHITE,
-        {2, 2});
-
-    // change hudUi to reference text center
-    hudUiY = hudUiY + (fontSize - barHeight) / 2 - 5;
-    DrawRectangle(healthBarStartX, hudUiY, barWidth, barHeight, DARKGRAY);
-
-    DrawRectangle(healthBarStartX, hudUiY,
-                  static_cast<int>(barWidth * Clamp(healthRatio, 0.0f, 1.0f)),
-                  barHeight, RED);
-
-    DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
 }
 
 void Graphics::buildGameTexture()
@@ -289,6 +275,7 @@ void Graphics::drawGameOver(GameResult result)
                    {0, 0, windowDimensions.x, -windowDimensions.y},
                    {0, 0},
                    WHITE);
+
     EndDrawing();
 }
 
@@ -335,6 +322,48 @@ void Graphics::buildGameOver(GameResult result)
         WHITE,
         {3, 3});
 
+    EndTextureMode();
+}
+
+void Graphics::drawHud(const GameView &view)
+{
+    const int fontSize = 80;
+    const int barWidth = 300;
+    const int barHeight = 28;
+    const float healthRatio = view.playerMaxHealth > 0.0f
+                                  ? view.playerHealth / view.playerMaxHealth
+                                  : 0.0f;
+
+    int healthEdgeBuffer = 30;
+    int hudUiY = 20;
+    int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
+
+    DrawDoubleText(
+        gameFont,
+        TextFormat("RounD %d / %d", view.currentRound, view.maxRounds),
+        {static_cast<float>(healthEdgeBuffer), static_cast<float>(hudUiY)},
+        fontSize,
+        1.0f,
+        RED,
+        WHITE,
+        {2, 2});
+
+    // TODO fix | currently: hudUi to reference text center with magic number offset
+    hudUiY = hudUiY + (fontSize - barHeight) / 2 - 5;
+    DrawRectangle(healthBarStartX, hudUiY, barWidth, barHeight, DARKGRAY);
+
+    DrawRectangle(healthBarStartX, hudUiY,
+                  static_cast<int>(barWidth * Clamp(healthRatio, 0.0f, 1.0f)),
+                  barHeight, RED);
+
+    DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
+}
+
+void Graphics::buildHud(const GameView &view)
+{
+    BeginTextureMode(hudTexture);
+    ClearBackground(BLANK);
+    drawHud(view);
     EndTextureMode();
 }
 

@@ -28,12 +28,16 @@ public:
 private:
     void drawGame(const GameView &view);
     void buildGameTexture();
+
+    // TODO function uses and names (draw | build) not consistent
     void drawMainMenu();
     void buildMainMenu();
+
     void drawGameOver(GameResult result);
     void buildGameOver(GameResult result);
 
     void drawHud(const GameView &view);
+    void buildHud(const GameView &view);
 
     void drawGameTestGrid();
 
@@ -43,10 +47,13 @@ private:
 private:
     Vector2 windowDimensions;
     Vector2 worldDimensions;
+    Vector2 renderDimensions;
 
     RenderTexture2D gameTexture;
     RenderTexture2D mainMenuTexture;
+    // TODO game over shouldnt be its own texture, game texture can adopt it
     RenderTexture2D gameOverTexture;
+    RenderTexture2D hudTexture;
 
     Camera2D camera;
 
@@ -54,6 +61,8 @@ private:
     TextureManager *textureManager;
 
     Font gameFont;
+
+    Shader bloom;
 
     // TODO change name not rlly a timer | used for alpha (fade animation)
     // TODO not great design
