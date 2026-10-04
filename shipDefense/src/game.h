@@ -11,9 +11,8 @@
 #include "collisionManager.h"
 #include "updateManager.h"
 #include "textureManager.h"
-#include "graphics.h"
 #include "waveSpawner.h"
-#include "sceneTypes.h"
+#include "gameView.h"
 
 // TODO
 
@@ -21,7 +20,7 @@ class Game : public Updateable
 {
 public:
     Game(RenderManager *renderManager, UpdateManager *updateManager,
-         CollisionManager *collisionManager, World *world, Graphics *graphics,
+         CollisionManager *collisionManager, World *world,
          TextureManager *textureManager);
 
     ~Game();
@@ -31,13 +30,13 @@ public:
     void startRound();
     void resetGame();
     GameResult getResult() const;
+    GameView getView() const;
 
 private:
     void initPlayerShip();
 
 private:
     World *world;
-    Graphics *graphics;
     ProjectileManager projectileManager;
     ShipManager shipManager;
     WaveSpawner waveSpawner;

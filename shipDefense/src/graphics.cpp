@@ -30,7 +30,7 @@ Graphics::~Graphics()
     UnloadRenderTexture(gameOverTexture);
 }
 
-void Graphics::draw(const Scene &scene, GameResult result)
+void Graphics::draw(const Scene &scene, const GameView &view)
 {
     switch (scene)
     {
@@ -38,10 +38,10 @@ void Graphics::draw(const Scene &scene, GameResult result)
         drawMainMenu();
         break;
     case Scene::Game:
-        drawGame();
+        drawGame(view);
         break;
     case Scene::GameOver:
-        drawGameOver(result);
+        drawGameOver(view.result);
         break;
     }
 }
@@ -82,8 +82,9 @@ void Graphics::updateCamera(Vector2 target)
     }
 }
 
-void Graphics::drawGame()
+void Graphics::drawGame(const GameView &view)
 {
+    updateCamera(view.cameraTarget);
     buildGameTexture();
 
     BeginDrawing();
@@ -93,9 +94,29 @@ void Graphics::drawGame()
                    {0, 0},
                    WHITE);
 
+    drawHud(view);
     DrawFPS(10, 10);
 
     EndDrawing();
+}
+
+void Graphics::drawHud(const GameView &view)
+{
+    const int fontSize = 28;
+    const int barWidth = 320;
+    const int barHeight = 28;
+    const float healthRatio = view.playerMaxHealth > 0.0f
+                                  ? view.playerHealth / view.playerMaxHealth
+                                  : 0.0f;
+
+    DrawText(TextFormat("Round %d / %d", view.currentRound, view.maxRounds),
+             20, 20, fontSize, WHITE);
+
+    DrawRectangle(20, 62, barWidth, barHeight, DARKGRAY);
+    DrawRectangle(20, 62,
+                  static_cast<int>(barWidth * Clamp(healthRatio, 0.0f, 1.0f)),
+                  barHeight, GREEN);
+    DrawRectangleLines(20, 62, barWidth, barHeight, WHITE);
 }
 
 void Graphics::buildGameTexture()

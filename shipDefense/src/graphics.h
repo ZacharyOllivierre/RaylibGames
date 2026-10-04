@@ -4,7 +4,7 @@
 
 #include "renderManager.h"
 #include "textureManager.h"
-#include "sceneTypes.h"
+#include "gameView.h"
 
 class Graphics
 {
@@ -16,18 +16,20 @@ public:
 
     ~Graphics();
 
-    void draw(const Scene &scene, GameResult result);
+    void draw(const Scene &scene, const GameView &view);
 
     Camera2D &getCamera();
     void updateCamera(Vector2 target);
 
 private:
-    void drawGame();
+    void drawGame(const GameView &view);
     void buildGameTexture();
     void drawMainMenu();
     void buildMainMenu();
     void drawGameOver(GameResult result);
     void buildGameOver(GameResult result);
+
+    void drawHud(const GameView &view);
 
     void drawGameTestGrid();
 

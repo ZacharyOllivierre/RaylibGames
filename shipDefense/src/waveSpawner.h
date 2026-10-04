@@ -22,6 +22,12 @@ public:
     bool hasNextWave() const;
     void reset();
 
+    void getRoundInfo(int &currentRound, int &maxRounds) const
+    {
+        currentRound = this->round;
+        maxRounds = this->maxRounds;
+    }
+
 private:
     void calculateWaveShips();
     ShipData calculateShipStats(ShipManager::ShipType shipType);

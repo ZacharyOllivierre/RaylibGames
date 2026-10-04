@@ -19,6 +19,8 @@ Ship::Ship(ShipData data, World &world, const ShipVisuals &visuals,
       visuals(visuals),
       projectileSpawner(std::move(projectileSpawner))
 {
+    if (this->data.maxHealth <= 0.0f)
+        this->data.maxHealth = this->data.health;
 }
 
 void Ship::spawnProjectile(std::unique_ptr<Projectile> projectile)
@@ -55,6 +57,11 @@ bool Ship::isPlayerShip() const
 float Ship::getHealth() const
 {
     return data.health;
+}
+
+float Ship::getMaxHealth() const
+{
+    return data.maxHealth;
 }
 
 bool Ship::isDead() const

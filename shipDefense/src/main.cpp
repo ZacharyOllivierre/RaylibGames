@@ -32,7 +32,7 @@ int main()
                       &renderManager, &textureManager);
 
     Game game(&renderManager, &updateManager, &collisionManager, &world,
-              &graphics, &textureManager);
+              &textureManager);
     updateManager.add(&game);
 
     Scene scene = Scene::MainMenu;
@@ -40,7 +40,7 @@ int main()
     while (!WindowShouldClose())
     {
 
-        graphics.draw(scene, game.getResult());
+        graphics.draw(scene, game.getView());
 
         switch (scene)
         {

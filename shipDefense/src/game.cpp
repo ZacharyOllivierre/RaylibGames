@@ -1,9 +1,9 @@
 #include "game.h"
 
 Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
-           CollisionManager *collisionManager, World *world, Graphics *graphics,
+           CollisionManager *collisionManager, World *world,
            TextureManager *textureManager)
-    : world(world), graphics(graphics),
+    : world(world),
       projectileManager(*renderManager, *updateManager, *collisionManager),
       shipManager(*renderManager, *updateManager, *collisionManager, *world,
                   *textureManager, projectileManager.getSpawner()),
@@ -23,8 +23,6 @@ void Game::update(float delta)
 {
     if (result != GameResult::InProgress)
         return;
-
-    graphics->updateCamera(shipManager.getPlayerShip()->getPosition());
 
     shipManager.cleanupDestroyedShips();
     projectileManager.cleanup();
@@ -66,6 +64,22 @@ void Game::resetGame()
 GameResult Game::getResult() const
 {
     return result;
+}
+
+GameView Game::getView() const
+{
+    const PlayerShip *player = shipManager.getPlayerShip();
+    int currentRound;
+    int maxRounds;
+    waveSpawner.getRoundInfo(currentRound, maxRounds);
+
+    return {
+        currentRound,
+        maxRounds,
+        player->getHealth(),
+        player->getMaxHealth(),
+        player->getPosition(),
+        result};
 }
 
 void Game::initPlayerShip()

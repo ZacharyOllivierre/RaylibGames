@@ -27,6 +27,7 @@ struct ShipData
     float rotation = 0.0f;
     float health = 100.0f;
     float contactDamage = 1.0f;
+    float maxHealth = 0.0f;
 };
 
 class Ship : public Updateable,
@@ -46,6 +47,7 @@ public:
     virtual bool isPlayerShip() const;
 
     float getHealth() const;
+    float getMaxHealth() const;
 
     bool isDead() const;
 

@@ -90,6 +90,7 @@ void ShipManager::clear()
 {
     for (const auto &enemy : enemyShips)
         unregisterShip(*enemy);
+
     enemyShips.clear();
 
     if (playerShip)
