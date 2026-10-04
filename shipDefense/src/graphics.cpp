@@ -109,14 +109,20 @@ void Graphics::drawHud(const GameView &view)
                                   ? view.playerHealth / view.playerMaxHealth
                                   : 0.0f;
 
-    DrawText(TextFormat("Round %d / %d", view.currentRound, view.maxRounds),
-             20, 20, fontSize, WHITE);
+    int healthEdgeBuffer = 30;
+    int hudUiY = 20;
+    int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
 
-    DrawRectangle(20, 62, barWidth, barHeight, DARKGRAY);
-    DrawRectangle(20, 62,
+    DrawText(TextFormat("Round %d / %d", view.currentRound, view.maxRounds),
+             healthEdgeBuffer, hudUiY, fontSize, WHITE);
+
+    DrawRectangle(healthBarStartX, hudUiY, barWidth, barHeight, DARKGRAY);
+
+    DrawRectangle(healthBarStartX, hudUiY,
                   static_cast<int>(barWidth * Clamp(healthRatio, 0.0f, 1.0f)),
-                  barHeight, GREEN);
-    DrawRectangleLines(20, 62, barWidth, barHeight, WHITE);
+                  barHeight, RED);
+
+    DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
 }
 
 void Graphics::buildGameTexture()
