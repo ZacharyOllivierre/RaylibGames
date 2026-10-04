@@ -28,6 +28,7 @@ struct ShipData
     float health = 100.0f;
     float contactDamage = 1.0f;
     float maxHealth = 0.0f;
+    bool wrapAtEdges = false;
 };
 
 class Ship : public Updateable,

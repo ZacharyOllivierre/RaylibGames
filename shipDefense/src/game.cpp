@@ -7,7 +7,7 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
       projectileManager(*renderManager, *updateManager, *collisionManager),
       shipManager(*renderManager, *updateManager, *collisionManager, *world,
                   *textureManager, projectileManager.getSpawner()),
-      waveSpawner(1.0f, 10, shipManager, *world),
+      waveSpawner(1.1f, 10, shipManager, *world),
       result(GameResult::InProgress)
 {
     initPlayerShip();
@@ -84,6 +84,9 @@ GameView Game::getView() const
 
 void Game::initPlayerShip()
 {
-    ShipData shipData{{100, 100}, {36, 36}, {48, 48}, 1000.0f, 0.0f, 100.0f, 1.0f};
+    Vector2 area = world->getDimensions();
+
+    ShipData shipData{{area.x / 2, area.y / 2}, {40, 40}, {64, 64}, 600.0f, 0.0f, 100.0f, 1.0f};
+    shipData.wrapAtEdges = true;
     shipManager.createShip(ShipManager::ShipType::Player, shipData);
 }

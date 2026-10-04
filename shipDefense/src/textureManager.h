@@ -18,6 +18,7 @@ public:
           playerDestructionTexture(LoadTexture("assets/textures/ships/Destruction/Player - Destruction-Sheet.png")),
           pelletTexture(LoadTexture("assets/textures/projectiles/Pellet Bullet-Sheet.png")),
           starBackground(LoadTexture("assets/textures/stars.png")),
+          starEmpty(LoadTexture("assets/textures/starsNoBackground.png")),
           playerEngines(playerEngineTexture, {48, 48}),
           bomberEngines(bomberEngineTexture, {64, 64}),
           fighterEngines(fighterEngineTexture, {64, 64}),
@@ -44,6 +45,7 @@ public:
         UnloadTexture(playerDestructionTexture);
         UnloadTexture(pelletTexture);
         UnloadTexture(starBackground);
+        UnloadTexture(starEmpty);
     }
 
 public:
@@ -61,6 +63,7 @@ public:
     Texture2D pelletTexture;
 
     Texture2D starBackground;
+    Texture2D starEmpty;
 
     Atlas playerEngines;
     Atlas bomberEngines;

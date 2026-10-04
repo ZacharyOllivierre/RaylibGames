@@ -9,7 +9,7 @@ class World
 public:
     World(Vector2 dimensions);
 
-    void constrain(PhysicsBody &body);
+    void constrain(PhysicsBody &body, bool wrap = false);
 
     Vector2 getDimensions() const;
     Rectangle getBounds() const;

@@ -12,7 +12,7 @@ SOURCES = \
 OBJECTS = $(SOURCES:.cpp=.o)
 EXEC    = ex
 
-CXXFLAGS = -I/opt/homebrew/include -Iinclude -Iinclude/imgui -Iinclude/rlImGui -Wall -Wextra -std=c++17
+CXXFLAGS = -isystem /opt/homebrew/include -Iinclude -Iinclude/imgui -Iinclude/rlImGui -Wall -Wextra -std=c++17
 LDFLAGS  = -L/opt/homebrew/lib -lraylib -lvulkan -framework OpenGL -framework Cocoa -framework IOKit -framework CoreVideo
 
 $(EXEC): $(OBJECTS)

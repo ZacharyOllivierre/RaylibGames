@@ -23,10 +23,13 @@ void EnemyShip::applyFollowForce()
     switch (followType)
     {
     case FollowType::Touch:
+    {
         basicFollow(xForce, yForce);
         break;
+    }
 
     case FollowType::TouchRandom:
+    {
         basicFollow(xForce, yForce);
         if (GetRandomValue(0, 10) == 0)
         {
@@ -34,8 +37,10 @@ void EnemyShip::applyFollowForce()
             yForce *= GetRandomValue(0, 2);
         }
         break;
+    }
 
     case FollowType::Approach:
+    {
         float approachDistance = 200;
         Vector2 playerPosition = playerShip.getPosition();
         Vector2 shipPosition = getPosition();
@@ -58,6 +63,7 @@ void EnemyShip::applyFollowForce()
         }
         break;
     }
+    }
 
     addForce({xForce, yForce});
 }
@@ -71,12 +77,17 @@ void EnemyShip::basicFollow(float &xForce, float &yForce)
     float length = std::sqrt(direction.x * direction.x +
                              direction.y * direction.y);
 
-    if (length > 0.0f)
+    if (length <= 0.0f)
     {
-        direction.x /= length;
-        direction.y /= length;
+        xForce = 0.0f;
+        yForce = 0.0f;
+        return;
     }
 
-    xForce = direction.x * data.speed;
-    yForce = direction.y * data.speed;
+    direction.x = direction.x / length * data.speed;
+    direction.y = direction.y / length * data.speed;
+
+    Vector2 velocity = getVelocity();
+    xForce = direction.x - velocity.x;
+    yForce = direction.y - velocity.y;
 }

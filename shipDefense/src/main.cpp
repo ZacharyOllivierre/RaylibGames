@@ -39,22 +39,25 @@ int main()
 
     while (!WindowShouldClose())
     {
+        float delta = GetFrameTime();
 
         graphics.draw(scene, game.getView());
+        graphics.updateTimers(scene, delta);
 
         switch (scene)
         {
         case Scene::MainMenu:
+        {
             if (IsKeyPressed(KEY_SPACE))
             {
                 game.resetGame();
                 scene = Scene::Game;
+                graphics.setMainMenuTimer(0);
             }
             break;
-
+        }
         case Scene::Game:
         {
-            float delta = GetFrameTime();
             updateManager.update(delta);
             collisionManager.checkCollisions();
 
@@ -63,16 +66,16 @@ int main()
 
             break;
         }
-
         case Scene::GameOver:
+        {
             if (IsKeyPressed(KEY_SPACE))
             {
                 // duplicate
                 game.resetGame();
                 scene = Scene::MainMenu;
             }
-
             break;
+        }
         }
     }
 

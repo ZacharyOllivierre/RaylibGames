@@ -41,7 +41,7 @@ void Ship::update(float delta)
         return;
 
     PhysicsBody::update(delta);
-    world.constrain(*this);
+    world.constrain(*this, data.wrapAtEdges);
 }
 
 Rectangle Ship::getCollisionBounds() const
@@ -97,7 +97,7 @@ void Ship::onCollision(Collidable &other,
         dealDamage(*otherShip, data.contactDamage, DamageType::Contact);
     }
 
-    addForce(Vector2Scale(contact.normal, contact.penetration));
+    addForce(Vector2Scale(contact.normal, contact.penetration) * 50);
 }
 
 void Ship::render()

@@ -9,7 +9,10 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
     : windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
       renderManager(rManager),
-      textureManager(textureManager)
+      textureManager(textureManager),
+      mainMenuTimer(0),
+      mainMenuSubTimer(0),
+      starRotation(0)
 {
     gameTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
     mainMenuTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
@@ -20,7 +23,16 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
         {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
         {windowDimensions.x / 2.0f, windowDimensions.y / 2.0f},
         0.0f,
-        1.0f};
+        1.2f};
+
+    // font
+    gameFont = LoadFontEx(
+        "assets/fonts/Doom2016.ttf",
+        480,
+        nullptr,
+        0);
+    // helps with font grainyness
+    SetTextureFilter(gameFont.texture, TEXTURE_FILTER_BILINEAR);
 };
 
 Graphics::~Graphics()
@@ -28,6 +40,8 @@ Graphics::~Graphics()
     UnloadRenderTexture(gameTexture);
     UnloadRenderTexture(mainMenuTexture);
     UnloadRenderTexture(gameOverTexture);
+
+    UnloadFont(gameFont);
 }
 
 void Graphics::draw(const Scene &scene, const GameView &view)
@@ -53,8 +67,8 @@ Camera2D &Graphics::getCamera()
 
 void Graphics::updateCamera(Vector2 target)
 {
-    float halfWidth = windowDimensions.x / 2.0f;
-    float halfHeight = windowDimensions.y / 2.0f;
+    float halfWidth = windowDimensions.x / (2.0f * camera.zoom);
+    float halfHeight = windowDimensions.y / (2.0f * camera.zoom);
 
     // if the world is smaller than the viewport keep the camera centered on the world
     if (worldDimensions.x <= windowDimensions.x)
@@ -82,6 +96,34 @@ void Graphics::updateCamera(Vector2 target)
     }
 }
 
+void Graphics::updateTimers(const Scene &scene, float delta)
+{
+    if (scene == Scene::MainMenu)
+    {
+        if (mainMenuTimer <= 255)
+            mainMenuTimer += delta / 2;
+
+        if (mainMenuSubTimer <= 6)
+            mainMenuSubTimer += delta * 4;
+        else
+            mainMenuSubTimer = 0;
+    }
+    else if (scene == Scene::Game)
+    {
+        if (starRotation >= 360)
+        {
+            starRotation = 0;
+        }
+        else
+        {
+            starRotation += delta;
+        }
+    }
+    else if (scene == Scene::GameOver)
+    {
+    }
+}
+
 void Graphics::drawGame(const GameView &view)
 {
     updateCamera(view.cameraTarget);
@@ -102,8 +144,8 @@ void Graphics::drawGame(const GameView &view)
 
 void Graphics::drawHud(const GameView &view)
 {
-    const int fontSize = 28;
-    const int barWidth = 320;
+    const int fontSize = 80;
+    const int barWidth = 300;
     const int barHeight = 28;
     const float healthRatio = view.playerMaxHealth > 0.0f
                                   ? view.playerHealth / view.playerMaxHealth
@@ -113,9 +155,18 @@ void Graphics::drawHud(const GameView &view)
     int hudUiY = 20;
     int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
 
-    DrawText(TextFormat("Round %d / %d", view.currentRound, view.maxRounds),
-             healthEdgeBuffer, hudUiY, fontSize, WHITE);
+    DrawDoubleText(
+        gameFont,
+        TextFormat("RounD %d / %d", view.currentRound, view.maxRounds),
+        {static_cast<float>(healthEdgeBuffer), static_cast<float>(hudUiY)},
+        fontSize,
+        1.0f,
+        RED,
+        WHITE,
+        {2, 2});
 
+    // change hudUi to reference text center
+    hudUiY = hudUiY + (fontSize - barHeight) / 2 - 5;
     DrawRectangle(healthBarStartX, hudUiY, barWidth, barHeight, DARKGRAY);
 
     DrawRectangle(healthBarStartX, hudUiY,
@@ -133,6 +184,7 @@ void Graphics::buildGameTexture()
 
     BeginMode2D(camera);
 
+    // Background
     Texture2D *stars = &textureManager->starBackground;
     DrawTexturePro(*stars,
                    {0, 0, (float)stars->width, (float)stars->height},
@@ -141,6 +193,21 @@ void Graphics::buildGameTexture()
                    0.0f,
                    WHITE);
 
+    Texture2D *starsEmpty = &textureManager->starEmpty;
+    Vector2 center = {
+        worldDimensions.x / 2.0f,
+        worldDimensions.y / 2.0f};
+
+    // animated background inverted
+    DrawTexturePro(
+        *starsEmpty,
+        {0, 0, -(float)starsEmpty->width, -(float)starsEmpty->height},
+        {center.x, center.y, worldDimensions.x, worldDimensions.y},
+        {worldDimensions.x / 2.0f, worldDimensions.y / 2.0f},
+        starRotation,
+        WHITE);
+
+    // Objects
     // drawGameTestGrid();
     renderManager->render();
 
@@ -167,16 +234,47 @@ void Graphics::buildMainMenu()
     BeginTextureMode(mainMenuTexture);
     ClearBackground(BLACK);
 
-    int fontSize = 150;
-    char text[] = "Game";
+    const char *titleText = "ShipS AnD StufF";
+    const int titleFontSize = 300;
+    const float titleSpacing = 3.0f;
 
-    DrawText(text, windowDimensions.x / 2 - MeasureText(text, fontSize) / 2,
-             windowDimensions.y / 2 - fontSize, fontSize, RED);
+    Vector2 titleSize = MeasureTextEx(
+        gameFont, titleText,
+        titleFontSize, titleSpacing);
 
-    char subText[] = "Press Space to Continue";
-    int subFontSize = 60;
-    DrawText(subText, windowDimensions.x / 2 - MeasureText(subText, subFontSize) / 2,
-             windowDimensions.y * 0.75 - subFontSize, subFontSize, WHITE);
+    Vector2 titlePosition = {
+        (windowDimensions.x - titleSize.x) / 2.0f,
+        (float)(windowDimensions.y * 0.10)};
+
+    DrawDoubleText(
+        gameFont,
+        titleText,
+        titlePosition,
+        titleFontSize,
+        titleSpacing,
+        RED,
+        WHITE,
+        {5, 5}, mainMenuTimer);
+
+    // flashing "continue", 6 is timer max
+    if (mainMenuSubTimer <= 4)
+    {
+        char subText[] = "press space to continue";
+        int subFontSize = 120;
+        int spacing = 1;
+
+        DrawDoubleText(
+            gameFont,
+            subText,
+            {windowDimensions.x / 2 -
+                 MeasureTextEx(gameFont, subText, subFontSize, spacing).x / 2,
+             windowDimensions.y * 0.75f - subFontSize},
+            subFontSize,
+            spacing,
+            RED,
+            WHITE,
+            {3, 3});
+    }
 
     EndTextureMode();
 }
@@ -199,17 +297,43 @@ void Graphics::buildGameOver(GameResult result)
     BeginTextureMode(gameOverTexture);
     ClearBackground(BLACK);
 
-    const char *text = result == GameResult::Win ? "Win" : "Lose";
-    const int fontSize = 150;
-    DrawText(text, windowDimensions.x / 2 - MeasureText(text, fontSize) / 2,
-             windowDimensions.y / 2 - fontSize, fontSize,
-             result == GameResult::Win ? GREEN : RED);
+    const char *text = result == GameResult::Win ? "WiN" : "LosT";
+    const int fontSize = 240;
+    const float spacing = 3.0f;
 
-    const char *subText = "Press Space to Restart";
-    const int subFontSize = 60;
-    DrawText(subText,
-             windowDimensions.x / 2 - MeasureText(subText, subFontSize) / 2,
-             windowDimensions.y * 0.75 - subFontSize, subFontSize, WHITE);
+    Vector2 textSize = MeasureTextEx(
+        gameFont,
+        text,
+        fontSize,
+        spacing);
+
+    DrawDoubleText(
+        gameFont, text,
+        {(windowDimensions.x - textSize.x) / 2.0f,
+         windowDimensions.y / 2.0f - fontSize},
+        fontSize, spacing,
+        result == GameResult::Win ? GREEN : RED,
+        WHITE,
+        {5, 5});
+
+    const char *subText = "press space to restart";
+    const int subFontSize = 120;
+    const float subSpacing = 1.0f;
+
+    Vector2 subTextSize = MeasureTextEx(
+        gameFont,
+        subText,
+        subFontSize,
+        subSpacing);
+
+    DrawDoubleText(
+        gameFont, subText,
+        {(windowDimensions.x - subTextSize.x) / 2.0f,
+         windowDimensions.y * 0.75f - subFontSize},
+        subFontSize, subSpacing,
+        RED,
+        WHITE,
+        {3, 3});
 
     EndTextureMode();
 }
@@ -227,4 +351,27 @@ void Graphics::drawGameTestGrid()
         DrawLine(0, y, worldDimensions.x, y,
                  WHITE);
     }
+}
+
+void Graphics::DrawDoubleText(Font font, const char *text, Vector2 position, float fontSize,
+                              float spacing, Color backColor, Color frontColor, Vector2 offset, float alpha)
+{
+    backColor = Fade(backColor, alpha);
+    frontColor = Fade(frontColor, alpha);
+
+    DrawTextEx(
+        font,
+        text,
+        {position.x + offset.x, position.y + offset.y},
+        fontSize,
+        spacing,
+        backColor);
+
+    DrawTextEx(
+        font,
+        text,
+        position,
+        fontSize,
+        spacing,
+        frontColor);
 }

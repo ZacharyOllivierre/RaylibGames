@@ -34,7 +34,7 @@ void WaveSpawner::calculateWaveShips()
     int bomberCost = 5;
     int gunnerCost = 10;
 
-    int money = round * 5;
+    int money = round * 10;
 
     // randomly buys either bomber or gunner
     while (money >= 0)
@@ -66,20 +66,22 @@ ShipData WaveSpawner::calculateShipStats(ShipManager::ShipType shipType)
     if (shipType == ShipManager::ShipType::Bomber)
     {
         data.startingPosition = getEnemySpawnLocation();
-        data.hitBoxSize = {64, 64};
-        data.textureSize = {64, 64};
-        data.speed = 100.0f * progression;
-        data.health = 50.0f * progression;
-        data.contactDamage = 0.5f * progression;
+        data.hitBoxSize = {60, 60};
+        data.textureSize = {90, 90};
+        data.speed = 500.0f + (progression * 60);
+        data.health = 50.0f + (progression * 8);
+        data.contactDamage = 0.5f;
+        data.wrapAtEdges = true;
     }
     else if (shipType == ShipManager::ShipType::Gunner)
     {
         data.startingPosition = getEnemySpawnLocation();
-        data.hitBoxSize = {64, 64};
-        data.textureSize = {64, 64};
-        data.speed = 100.0f * progression;
-        data.health = 100.0f * progression;
-        data.contactDamage = 0.6f * progression;
+        data.hitBoxSize = {60, 60};
+        data.textureSize = {90, 90};
+        data.speed = 400.0f + (progression * 60);
+        data.health = 100.0f + (progression * 8);
+        data.contactDamage = 0.6f;
+        data.wrapAtEdges = true;
     }
 
     return data;

@@ -2,7 +2,6 @@
 
 #include "interfaces/physicsBody.h"
 #include "raymath.h"
-
 #include <algorithm>
 
 World::World(Vector2 dimensions)
@@ -10,7 +9,7 @@ World::World(Vector2 dimensions)
 {
 }
 
-void World::constrain(PhysicsBody &body)
+void World::constrain(PhysicsBody &body, bool wrap)
 {
     Rectangle bodyRect = body.getBody();
 
@@ -21,6 +20,22 @@ void World::constrain(PhysicsBody &body)
     float maxY = std::max(0.0f, dimensions.y - bodyRect.height);
 
     Vector2 position = body.getPosition();
+
+    if (wrap)
+    {
+        if (position.x < minX)
+            position.x = maxX;
+        else if (position.x > maxX)
+            position.x = minX;
+
+        if (position.y < minY)
+            position.y = maxY;
+        else if (position.y > maxY)
+            position.y = minY;
+
+        body.setPosition(position);
+        return;
+    }
 
     bool hitX = false;
     bool hitY = false;
