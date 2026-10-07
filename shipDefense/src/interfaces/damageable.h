@@ -2,6 +2,13 @@
 
 class Damageable;
 
+enum class Team
+{
+    Neutral,
+    Player,
+    Enemy,
+};
+
 enum class DamageType
 {
     Contact,
@@ -19,6 +26,11 @@ class Damageable
 {
 public:
     virtual ~Damageable() = default;
+
+    virtual Team getTeam() const
+    {
+        return Team::Neutral;
+    }
 
     void dealDamage(Damageable &target, float amount, DamageType type)
     {

@@ -49,6 +49,7 @@ Ship &ShipManager::createShip(ShipType type, const ShipData &data)
     {
         enemy = std::make_unique<GunnerShip>(
             data, world, *playerShip, textureManager.fighterVisuals,
+            textureManager.torpedoAtlas,
             projectileSpawner);
     }
     else

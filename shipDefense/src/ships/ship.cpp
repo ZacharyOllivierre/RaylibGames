@@ -141,5 +141,5 @@ void Ship::render()
     }
 
     // TODO debug hitbox draw
-    // DrawRectangleLinesEx(body, 2.0f, RED);
+    DrawRectangleLinesEx(body, 2.0f, RED);
 }

@@ -81,7 +81,7 @@ ShipData WaveSpawner::calculateShipStats(ShipManager::ShipType shipType)
         data.speed = 300.0f * (progression) / 2;
         data.health = 100.0f + (progression * 8);
         data.contactDamage = 0.6f;
-        data.wrapAtEdges = true;
+        data.wrapAtEdges = false;
     }
 
     return data;

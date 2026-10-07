@@ -20,12 +20,13 @@ class Projectile : public Updateable,
 public:
     Projectile(Vector2 position, Vector2 velocity, Vector2 hitBoxSize,
                Vector2 textureSize, Atlas &atlas, Damageable &owner,
-               float damage, float lifetime = 3.0f)
+               float damage, float lifetime = 5.0f)
         : PhysicsBody({position.x, position.y, hitBoxSize.x, hitBoxSize.y},
                       {1.0f, 1.0f}),
           textureSize(textureSize),
           atlas(atlas),
           owner(owner),
+          ownerTeam(owner.getTeam()),
           damage(damage),
           lifetime(lifetime)
     {
@@ -56,6 +57,9 @@ public:
         if (target == nullptr || target == &owner || projectileTarget != nullptr)
             return;
 
+        if (target->getTeam() != Team::Neutral && target->getTeam() == ownerTeam)
+            return;
+
         dealDamage(*target, damage, DamageType::Projectile);
         lifetime = 0.0f;
     }
@@ -78,6 +82,9 @@ public:
             rotation,
             textureSize,
             atlas.getFrame(animationTime, framesPerSecond));
+
+        // TODO debug hitbox draw
+        DrawRectangleLinesEx(PhysicsBody::getBody(), 2, RED);
     }
 
     bool isExpired() const
@@ -89,6 +96,7 @@ private:
     Vector2 textureSize;
     Atlas &atlas;
     Damageable &owner;
+    Team ownerTeam;
     float damage;
     float lifetime;
     float animationTime = 0.0f;

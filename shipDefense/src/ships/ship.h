@@ -47,6 +47,11 @@ public:
 
     virtual bool isPlayerShip() const;
 
+    Team getTeam() const override
+    {
+        return isPlayerShip() ? Team::Player : Team::Enemy;
+    }
+
     float getHealth() const;
     float getMaxHealth() const;
 
