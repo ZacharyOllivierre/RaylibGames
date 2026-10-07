@@ -4,8 +4,9 @@
 #include <algorithm>
 
 Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
-                   RenderManager *rManager, TextureManager *textureManager)
-    : windowDimensions(windowDimensions),
+                   RenderManager *rManager, TextureManager *textureManager, Game *game)
+    : game(game),
+      windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
       renderDimensions({854, 480}),
       renderManager(rManager),
@@ -50,6 +51,15 @@ Graphics::~Graphics()
     UnloadShader(bloom);
 }
 
+void Graphics::update(const Scene &scene, float delta)
+{
+    const GameView &view = game->getView();
+
+    updateTimers(scene, delta);
+    updateCamera(view.cameraTarget);
+    draw(scene, view);
+}
+
 void Graphics::draw(const Scene &scene, const GameView &view)
 {
     switch (scene)
@@ -66,9 +76,32 @@ void Graphics::draw(const Scene &scene, const GameView &view)
     }
 }
 
-Camera2D &Graphics::getCamera()
+void Graphics::updateTimers(const Scene &scene, float delta)
 {
-    return camera;
+    if (scene == Scene::MainMenu)
+    {
+        if (mainMenuTimer <= 255)
+            mainMenuTimer += delta / 2.5;
+
+        if (mainMenuSubTimer <= 6)
+            mainMenuSubTimer += delta * 4;
+        else
+            mainMenuSubTimer = 0;
+    }
+    else if (scene == Scene::Game)
+    {
+        if (starRotation >= 360)
+        {
+            starRotation = 0;
+        }
+        else
+        {
+            starRotation += delta * 4;
+        }
+    }
+    else if (scene == Scene::GameOver)
+    {
+    }
 }
 
 void Graphics::updateCamera(Vector2 target)
@@ -102,38 +135,8 @@ void Graphics::updateCamera(Vector2 target)
     }
 }
 
-void Graphics::updateTimers(const Scene &scene, float delta)
-{
-    if (scene == Scene::MainMenu)
-    {
-        if (mainMenuTimer <= 255)
-            mainMenuTimer += delta / 2.5;
-
-        if (mainMenuSubTimer <= 6)
-            mainMenuSubTimer += delta * 4;
-        else
-            mainMenuSubTimer = 0;
-    }
-    else if (scene == Scene::Game)
-    {
-        if (starRotation >= 360)
-        {
-            starRotation = 0;
-        }
-        else
-        {
-            starRotation += delta * 4;
-        }
-    }
-    else if (scene == Scene::GameOver)
-    {
-    }
-}
-
 void Graphics::drawGame(const GameView &view)
 {
-    updateCamera(view.cameraTarget);
-
     // build
     buildGameTexture();
     buildHud(view);
@@ -359,42 +362,56 @@ void Graphics::drawHud(const GameView &view)
 
     DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
 
-    // TODO test
-    // map
+    drawMap(view);
+}
+
+void Graphics::drawMap(const GameView &view)
+{
     Rectangle map = {
-        windowDimensions.x - 300,
-        windowDimensions.y - 150,
-        300.0f,
-        150.0f};
+        windowDimensions.x - 400,
+        windowDimensions.y - 200,
+        400.0f,
+        200.0f};
 
-    Color gridColor = Color{255, 255, 255, 200};
+    Color gridColor = Color{100, 220, 150, 190};
 
-    // draw background, grid, and outline
+    // draw background and grid
     DrawRectangleRec(map, Color{0, 0, 0, 150});
-    DrawRectangleLinesEx(map, 2, gridColor);
     drawGrid(map, map.height / 5, gridColor);
 
-    // TODO bug even positioning around player not correct
-    // draw player rec
-    Vector2 playerPos = view.cameraTarget;
-    int sizeDivisor = 5;
-    float width = map.width / sizeDivisor;
-    float height = map.height / sizeDivisor;
+    const Vector2 playerPosition = translateToMap(view.cameraTarget, map);
+    const RadarData &radar = game->getRadarData();
+    const float mapScale = map.width / worldDimensions.x;
 
-    // use smaller of would be sizes for player rec
-    float size = std::min(width, height);
+    BeginScissorMode(static_cast<int>(map.x), static_cast<int>(map.y),
+                     static_cast<int>(map.width), static_cast<int>(map.height));
 
-    // find position relative to map rectangle
-    Vector2 positionPercent = {
-        playerPos.x / worldDimensions.x,
-        playerPos.y / worldDimensions.y,
-    };
+    DrawCircleV(playerPosition,
+                radar.currentRadius * mapScale,
+                Fade(GREEN, 0.4f));
+    DrawCircleLinesV(playerPosition,
+                     radar.currentRadius * mapScale,
+                     Fade(GREEN, 0.9f));
 
-    DrawRectangleLinesEx(
-        {map.x + map.width * positionPercent.x,
-         map.y + map.height * positionPercent.y,
-         size, size},
-        2, gridColor);
+    for (const Vector2 enemyPosition : radar.activeShipPositions)
+    {
+        const Vector2 mapPosition = translateToMap(enemyPosition, map);
+        DrawCircleV(mapPosition, 3.0f, RED);
+        drawCornerRectangle({mapPosition.x - 8.0f, mapPosition.y - 8.0f,
+                             16.0f, 16.0f},
+                            0.35f, Fade(RED, 0.85f), 1.5f);
+    }
+
+    const float playerSize = std::min(map.width, map.height) / 5.0f;
+    drawCornerRectangle(
+        {playerPosition.x - playerSize / 2.0f,
+         playerPosition.y - playerSize / 2.0f,
+         playerSize, playerSize},
+        0.35f, gridColor);
+
+    EndScissorMode();
+
+    DrawRectangleLinesEx(map, 2, gridColor);
 }
 
 void Graphics::buildHud(const GameView &view)
@@ -420,6 +437,42 @@ void Graphics::drawGrid(Rectangle &area, int spacing, Color color)
                  area.x + area.width, area.y + y,
                  color);
     }
+}
+
+void Graphics::drawCornerRectangle(const Rectangle &area, float edgePercentage,
+                                   Color color, float lineThickness)
+{
+    const float edgeLength = std::min(area.width, area.height) *
+                             Clamp(edgePercentage, 0.0f, 1.0f);
+    const float right = area.x + area.width;
+    const float bottom = area.y + area.height;
+
+    DrawLineEx({area.x, area.y}, {area.x + edgeLength, area.y},
+               lineThickness, color);
+    DrawLineEx({area.x, area.y}, {area.x, area.y + edgeLength},
+               lineThickness, color);
+
+    DrawLineEx({right, area.y}, {right - edgeLength, area.y},
+               lineThickness, color);
+    DrawLineEx({right, area.y}, {right, area.y + edgeLength},
+               lineThickness, color);
+
+    DrawLineEx({area.x, bottom}, {area.x + edgeLength, bottom},
+               lineThickness, color);
+    DrawLineEx({area.x, bottom}, {area.x, bottom - edgeLength},
+               lineThickness, color);
+
+    DrawLineEx({right, bottom}, {right - edgeLength, bottom},
+               lineThickness, color);
+    DrawLineEx({right, bottom}, {right, bottom - edgeLength},
+               lineThickness, color);
+}
+
+Vector2 Graphics::translateToMap(Vector2 worldPosition, const Rectangle &map) const
+{
+    return {
+        map.x + worldPosition.x / worldDimensions.x * map.width,
+        map.y + worldPosition.y / worldDimensions.y * map.height};
 }
 
 void Graphics::DrawDoubleText(Font font, const char *text, Vector2 position, float fontSize,

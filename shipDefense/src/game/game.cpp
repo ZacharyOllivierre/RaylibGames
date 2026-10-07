@@ -8,7 +8,8 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
       shipManager(*renderManager, *updateManager, *collisionManager, *world,
                   *textureManager, projectileManager.getSpawner()),
       waveSpawner(1.1f, 10, shipManager, *world),
-      result(GameResult::InProgress)
+      result(GameResult::InProgress),
+      radar({700, 7, 1, 0, 0, {}})
 {
     initPlayerShip();
     startRound();
@@ -26,6 +27,8 @@ void Game::update(float delta)
 
     shipManager.cleanupDestroyedShips();
     projectileManager.cleanup();
+
+    fillRadar(delta);
 
     if (shipManager.getPlayerShip()->isDead())
     {
@@ -61,14 +64,11 @@ void Game::resetGame()
     startRound();
 }
 
-GameResult Game::getResult() const
-{
-    return result;
-}
-
+// TODO check that its okay this has been changed to return center
 GameView Game::getView() const
 {
     const PlayerShip *player = shipManager.getPlayerShip();
+    const Rectangle playerBody = player->getBody();
     int currentRound;
     int maxRounds;
     waveSpawner.getRoundInfo(currentRound, maxRounds);
@@ -78,7 +78,8 @@ GameView Game::getView() const
         maxRounds,
         player->getHealth(),
         player->getMaxHealth(),
-        player->getPosition(),
+        {playerBody.x + playerBody.width / 2.0f,
+         playerBody.y + playerBody.height / 2.0f},
         result};
 }
 
@@ -86,7 +87,41 @@ void Game::initPlayerShip()
 {
     Vector2 area = world->getDimensions();
 
-    ShipData shipData{{area.x / 2, area.y / 2}, {40, 40}, {64, 64}, 600.0f, 0.0f, 100.0f, 1.0f};
+    ShipData shipData{{area.x / 2, area.y / 2},
+                      {40, 40},
+                      {64, 64},
+                      600.0f,
+                      0.0f,
+                      100.0f,
+                      1.0f};
+
     shipData.wrapAtEdges = true;
     shipManager.createShip(ShipManager::ShipType::Player, shipData);
+}
+
+// fill radar with enemies currently "currentRadius" distance or less from player
+void Game::fillRadar(float delta)
+{
+    radar.updateScanning(delta);
+    radar.clearActiveShips();
+
+    Rectangle pBody = shipManager.getPlayerShip()->getBody();
+    Vector2 pPosition = {pBody.x + pBody.width / 2.0f,
+                         pBody.y + pBody.height / 2.0f};
+
+    auto shipPositions = shipManager.getEnemyPositions();
+    int radius = radar.getData().currentRadius;
+
+    for (const auto &enemyPos : shipPositions)
+    {
+        float dx = enemyPos.x - pPosition.x;
+        float dy = enemyPos.y - pPosition.y;
+
+        float distance = sqrtf(dx * dx + dy * dy);
+
+        if (distance <= radius)
+        {
+            radar.addActiveShip(enemyPos);
+        }
+    }
 }

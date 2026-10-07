@@ -34,6 +34,8 @@ public:
 
     PlayerShip *getPlayerShip() const;
 
+    const std::vector<Vector2> getEnemyPositions();
+
 private:
     void registerShip(Ship &ship);
     void unregisterShip(Ship &ship);

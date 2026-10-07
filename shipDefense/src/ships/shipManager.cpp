@@ -109,6 +109,20 @@ PlayerShip *ShipManager::getPlayerShip() const
     return playerShip.get();
 }
 
+const std::vector<Vector2> ShipManager::getEnemyPositions()
+{
+    std::vector<Vector2> shipPositions;
+
+    // returns center of ship bodies
+    for (auto &ships : enemyShips)
+    {
+        Rectangle body = ships->getBody();
+        shipPositions.push_back({body.x + body.width / 2,
+                                 body.y + body.height / 2});
+    }
+    return shipPositions;
+}
+
 void ShipManager::registerShip(Ship &ship)
 {
     updateManager.add(&ship);

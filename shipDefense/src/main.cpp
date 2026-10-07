@@ -11,7 +11,7 @@
 
 #include "sceneTypes.h"
 
-const Vector2 WORLD_SIZE = {2500, 2500};
+const Vector2 WORLD_SIZE = {3000, 1500};
 Vector2 WINDOW_SIZE = {1500, 900};
 
 int main()
@@ -37,7 +37,8 @@ int main()
               &textureManager);
     updateManager.add(&game);
 
-    Graphics graphics(WINDOW_SIZE, WORLD_SIZE, &renderManager, &textureManager);
+    Graphics graphics(WINDOW_SIZE, WORLD_SIZE,
+                      &renderManager, &textureManager, &game);
 
     Scene scene = Scene::MainMenu;
 
@@ -45,8 +46,7 @@ int main()
     {
         float delta = GetFrameTime();
 
-        graphics.draw(scene, game.getView());
-        graphics.updateTimers(scene, delta);
+        graphics.update(scene, delta);
 
         switch (scene)
         {
@@ -56,7 +56,7 @@ int main()
             {
                 game.resetGame();
                 scene = Scene::Game;
-                graphics.setMainMenuTimer(0);
+                graphics.resetMainMenu();
             }
             break;
         }

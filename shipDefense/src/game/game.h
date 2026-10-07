@@ -13,6 +13,7 @@
 #include "../textureManager.h"
 #include "waveSpawner.h"
 #include "gameView.h"
+#include "radar.h"
 
 // TODO
 
@@ -29,11 +30,15 @@ public:
 
     void startRound();
     void resetGame();
-    GameResult getResult() const;
+    GameResult getResult() const { return result; }
     GameView getView() const;
+
+    const RadarData &getRadarData() { return radar.getData(); }
 
 private:
     void initPlayerShip();
+
+    void fillRadar(float delta);
 
 private:
     World *world;
@@ -41,4 +46,5 @@ private:
     ShipManager shipManager;
     WaveSpawner waveSpawner;
     GameResult result;
+    Radar radar;
 };
