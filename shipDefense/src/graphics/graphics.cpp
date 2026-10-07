@@ -3,7 +3,6 @@
 #include "raymath.h"
 #include <algorithm>
 
-// sets game viewport as 75% and ui as 25%
 Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
                    RenderManager *rManager, TextureManager *textureManager)
     : windowDimensions(windowDimensions),
@@ -338,6 +337,7 @@ void Graphics::drawHud(const GameView &view)
     int hudUiY = 20;
     int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
 
+    // round
     DrawDoubleText(
         gameFont,
         TextFormat("RounD %d / %d", view.currentRound, view.maxRounds),
@@ -349,6 +349,7 @@ void Graphics::drawHud(const GameView &view)
         {2, 2});
 
     // TODO fix | currently: hudUi to reference text center with magic number offset
+    // healthbar
     hudUiY = hudUiY + (fontSize - barHeight) / 2 - 5;
     DrawRectangle(healthBarStartX, hudUiY, barWidth, barHeight, DARKGRAY);
 
@@ -357,6 +358,43 @@ void Graphics::drawHud(const GameView &view)
                   barHeight, RED);
 
     DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
+
+    // TODO test
+    // map
+    Rectangle map = {
+        windowDimensions.x - 300,
+        windowDimensions.y - 150,
+        300.0f,
+        150.0f};
+
+    Color gridColor = Color{255, 255, 255, 200};
+
+    // draw background, grid, and outline
+    DrawRectangleRec(map, Color{0, 0, 0, 150});
+    DrawRectangleLinesEx(map, 2, gridColor);
+    drawGrid(map, map.height / 5, gridColor);
+
+    // TODO bug even positioning around player not correct
+    // draw player rec
+    Vector2 playerPos = view.cameraTarget;
+    int sizeDivisor = 5;
+    float width = map.width / sizeDivisor;
+    float height = map.height / sizeDivisor;
+
+    // use smaller of would be sizes for player rec
+    float size = std::min(width, height);
+
+    // find position relative to map rectangle
+    Vector2 positionPercent = {
+        playerPos.x / worldDimensions.x,
+        playerPos.y / worldDimensions.y,
+    };
+
+    DrawRectangleLinesEx(
+        {map.x + map.width * positionPercent.x,
+         map.y + map.height * positionPercent.y,
+         size, size},
+        2, gridColor);
 }
 
 void Graphics::buildHud(const GameView &view)
@@ -367,18 +405,20 @@ void Graphics::buildHud(const GameView &view)
     EndTextureMode();
 }
 
-void Graphics::drawGameTestGrid()
+void Graphics::drawGrid(Rectangle &area, int spacing, Color color)
 {
-    for (int x = 0; x <= worldDimensions.x; x += 100)
+    for (int x = 0; x <= area.width; x += spacing)
     {
-        DrawLine(x, 0, x, worldDimensions.y,
-                 WHITE);
+        DrawLine(area.x + x, area.y,
+                 area.x + x, area.y + area.height,
+                 color);
     }
 
-    for (int y = 0; y <= worldDimensions.y; y += 100)
+    for (int y = 0; y <= area.height; y += spacing)
     {
-        DrawLine(0, y, worldDimensions.x, y,
-                 WHITE);
+        DrawLine(area.x, area.y + y,
+                 area.x + area.width, area.y + y,
+                 color);
     }
 }
 

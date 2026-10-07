@@ -5,9 +5,9 @@
 #include "renderManager.h"
 #include "textureManager.h"
 
-#include "graphics.h"
-#include "world.h"
-#include "game.h"
+#include "graphics/graphics.h"
+#include "game/world.h"
+#include "game/game.h"
 
 #include "sceneTypes.h"
 
@@ -20,6 +20,7 @@ int main()
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Ships And Stuff");
     ToggleFullscreen();
 
+    // TODO not a const
     WINDOW_SIZE = {(float)GetScreenWidth(), (float)GetScreenHeight()};
 
     SetTargetFPS(60);
@@ -29,15 +30,14 @@ int main()
     RenderManager renderManager;
     TextureManager textureManager;
 
+    // TODO world should be apart of game
     World world(WORLD_SIZE);
-
-    Graphics graphics(WINDOW_SIZE,
-                      WORLD_SIZE,
-                      &renderManager, &textureManager);
 
     Game game(&renderManager, &updateManager, &collisionManager, &world,
               &textureManager);
     updateManager.add(&game);
+
+    Graphics graphics(WINDOW_SIZE, WORLD_SIZE, &renderManager, &textureManager);
 
     Scene scene = Scene::MainMenu;
 

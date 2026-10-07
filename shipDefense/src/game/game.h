@@ -3,14 +3,14 @@
 #include <memory>
 #include <vector>
 
-#include "interfaces/updateable.h"
+#include "../interfaces/updateable.h"
 
-#include "ships/shipManager.h"
-#include "projectiles/projectileManager.h"
-#include "renderManager.h"
-#include "collisionManager.h"
-#include "updateManager.h"
-#include "textureManager.h"
+#include "../ships/shipManager.h"
+#include "../projectiles/projectileManager.h"
+#include "../renderManager.h"
+#include "../collisionManager.h"
+#include "../updateManager.h"
+#include "../textureManager.h"
 #include "waveSpawner.h"
 #include "gameView.h"
 

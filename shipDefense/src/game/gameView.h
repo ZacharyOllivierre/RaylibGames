@@ -2,7 +2,7 @@
 
 #include "raylib.h"
 
-#include "sceneTypes.h"
+#include "../sceneTypes.h"
 
 struct GameView
 {

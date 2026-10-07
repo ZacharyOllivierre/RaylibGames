@@ -1,7 +1,7 @@
 #pragma once
 
 #include "raylib.h"
-#include "atlas.h"
+#include "graphics/atlas.h"
 
 class TextureManager
 {

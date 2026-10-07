@@ -1,6 +1,6 @@
 #pragma once
 #include "raylib.h"
-#include "ships/shipManager.h"
+#include "../ships/shipManager.h"
 
 class World;
 

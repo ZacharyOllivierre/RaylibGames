@@ -6,8 +6,8 @@
 #include <memory>
 #include <utility>
 
-#include "../atlas.h"
-#include "../world.h"
+#include "../graphics/atlas.h"
+#include "../game/world.h"
 
 #include "../interfaces/collidable.h"
 #include "../interfaces/damageable.h"

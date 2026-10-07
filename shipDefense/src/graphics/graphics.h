@@ -2,9 +2,9 @@
 
 #include "raylib.h"
 
-#include "renderManager.h"
-#include "textureManager.h"
-#include "gameView.h"
+#include "../renderManager.h"
+#include "../textureManager.h"
+#include "../game/gameView.h"
 
 class Graphics
 {
@@ -39,7 +39,7 @@ private:
     void drawHud(const GameView &view);
     void buildHud(const GameView &view);
 
-    void drawGameTestGrid();
+    void drawGrid(Rectangle &area, int spacing, Color color);
 
     void DrawDoubleText(Font font, const char *text, Vector2 position, float fontSize,
                         float spacing, Color backColor, Color frontColor, Vector2 offset, float alpha = 255);

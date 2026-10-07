@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include "../atlas.h"
+#include "../graphics/atlas.h"
 #include "../interfaces/collidable.h"
 #include "../interfaces/damageable.h"
 #include "../interfaces/physicsBody.h"

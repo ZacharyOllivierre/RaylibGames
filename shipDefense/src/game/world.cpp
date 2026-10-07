@@ -1,6 +1,6 @@
 #include "world.h"
 
-#include "interfaces/physicsBody.h"
+#include "../interfaces/physicsBody.h"
 #include "raymath.h"
 #include <algorithm>
 
