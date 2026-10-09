@@ -4,6 +4,9 @@
 #include "../projectiles/torpedo.h"
 
 #include "raymath.h"
+#include "raylib.h"
+
+// TODO upgrade shot interval and interval variance system
 
 class GunnerShip : public EnemyShip
 {
@@ -17,6 +20,10 @@ public:
           timer(shotInterval),
           projectileAtlas(projectileAtlas)
     {
+        // random increase added for shot interval variance
+        int percentIncrease = GetRandomValue(0, 100);
+        shotInterval += shotInterval + (shotInterval * percentIncrease / 100);
+        timer = shotInterval;
     }
 
     void update(float delta) override
