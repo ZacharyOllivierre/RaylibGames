@@ -10,7 +10,8 @@ class PlayerShip : public Ship
 {
 public:
     PlayerShip(const ShipData &data, World &world, const ShipVisuals &visuals,
-               Atlas &projectileAtlas, ProjectileSpawner projectileSpawner);
+               Atlas &projectileAtlas, AudioManager &audioManager,
+               ProjectileSpawner projectileSpawner);
 
     void update(float delta) override;
 

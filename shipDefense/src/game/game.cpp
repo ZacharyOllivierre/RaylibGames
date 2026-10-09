@@ -4,11 +4,12 @@
 
 Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
            CollisionManager *collisionManager, World *world,
-           TextureManager *textureManager)
+           TextureManager *textureManager, AudioManager *audioManager)
     : world(world),
+      audioManager(audioManager),
       projectileManager(*renderManager, *updateManager, *collisionManager),
       shipManager(*renderManager, *updateManager, *collisionManager, *world,
-                  *textureManager, projectileManager.getSpawner()),
+                  *textureManager, *audioManager, projectileManager.getSpawner()),
       waveSpawner(1.1f, 25, shipManager, *world),
       result(GameResult::InProgress),
       radar({700, 7, 1, 0, 0, {}}),
@@ -55,6 +56,7 @@ void Game::update(float delta)
         {
             upgradeManager.generateChoices();
             upgradeWindowActive = true;
+            audioManager->playEffect(AudioManager::Effect::LevelUp);
         }
         else
         {
@@ -118,7 +120,8 @@ void Game::initPlayerShip()
 // fill radar with enemies currently "currentRadius" distance or less from player
 void Game::fillRadar(float delta)
 {
-    radar.updateScanning(delta);
+    if (radar.updateScanning(delta))
+        audioManager->playEffect(AudioManager::Effect::RadarPing);
     radar.clearActiveShips();
 
     Rectangle pBody = shipManager.getPlayerShip()->getBody();
@@ -157,6 +160,8 @@ void Game::chooseUpgrade(Vector2 mousePosition, Vector2 viewportSize)
         const Rectangle panel = UpgradeLayout::panel({1.0f, 1.0f}, index, choiceCount);
         if (CheckCollisionPointRec(normalizedMouse, panel))
         {
+            audioManager->playEffect(AudioManager::Effect::ChooseUpgrade);
+            audioManager->playEffect(AudioManager::Effect::ConfirmClick);
             shipManager.getPlayerShip()->applyUpgrade(upgradeManager.getUpgradeTypes()[index]);
             upgradeWindowActive = false;
             startRound();

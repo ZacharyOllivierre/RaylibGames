@@ -9,8 +9,9 @@
 // TODO starting projectile damage set here and not "init-able"
 PlayerShip::PlayerShip(const ShipData &data, World &world,
                        const ShipVisuals &visuals, Atlas &projectileAtlas,
+                       AudioManager &audioManager,
                        ProjectileSpawner projectileSpawner)
-    : Ship(data, world, visuals, std::move(projectileSpawner)),
+    : Ship(data, world, visuals, audioManager, std::move(projectileSpawner)),
       projectileAtlas(projectileAtlas),
       projectileDamage(25),
       projectileCooldown(0.8f)
@@ -51,6 +52,7 @@ void PlayerShip::fireProjectile()
     if (projectileCounter > 0)
         return;
     projectileCounter = projectileCooldown;
+    audioManager.playEffect(AudioManager::Effect::PlayerShoot);
 
     Rectangle body = getCollisionBounds();
     Vector2 center = {

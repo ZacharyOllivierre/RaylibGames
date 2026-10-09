@@ -9,9 +9,10 @@ class GunnerShip : public EnemyShip
 {
 public:
     GunnerShip(const ShipData &data, World &world, PlayerShip &playerShip,
-               const ShipVisuals &visuals, Atlas &projectileAtlas, ProjectileSpawner projectileSpawner)
+               const ShipVisuals &visuals, Atlas &projectileAtlas,
+               AudioManager &audioManager, ProjectileSpawner projectileSpawner)
         : EnemyShip(data, world, FollowType::Approach, playerShip, visuals,
-                    std::move(projectileSpawner)),
+                    audioManager, std::move(projectileSpawner)),
           shotInterval(1.5f),
           timer(shotInterval),
           projectileAtlas(projectileAtlas)
@@ -33,6 +34,7 @@ public:
 private:
     void fireProjectile()
     {
+        audioManager.playEffect(AudioManager::Effect::EnemyShoot);
         Rectangle body = getCollisionBounds();
         Vector2 center = {
             body.x + body.width / 2.0f,

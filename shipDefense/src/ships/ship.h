@@ -15,6 +15,7 @@
 #include "../interfaces/physicsBody.h"
 #include "../interfaces/renderable.h"
 #include "../interfaces/updateable.h"
+#include "../audioManager.h"
 
 class Projectile;
 using ProjectileSpawner = std::function<void(std::unique_ptr<Projectile>)>;
@@ -40,6 +41,7 @@ class Ship : public Updateable,
 {
 public:
     Ship(ShipData data, World &world, const ShipVisuals &visuals,
+         AudioManager &audioManager,
          ProjectileSpawner projectileSpawner);
 
     void update(float delta) override;
@@ -75,6 +77,7 @@ protected:
     ShipData data;
     World &world;
     const ShipVisuals &visuals;
+    AudioManager &audioManager;
     ProjectileSpawner projectileSpawner;
     float animationTime = 0.0f;
     float destructionTime = 0.0f;

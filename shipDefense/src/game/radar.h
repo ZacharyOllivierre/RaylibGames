@@ -23,28 +23,32 @@ public:
         return data;
     }
 
-    void updateScanning(float delta)
+    bool updateScanning(float delta)
     {
+        bool scanStarted = false;
+
         if (idle)
         {
             data.currentIdleTime += delta;
 
             if (data.currentIdleTime < data.scanningIdleTime)
-                return;
+                return false;
 
             data.currentIdleTime = 0;
             idle = false;
+            scanStarted = true;
         }
 
         if (data.currentRadius >= data.maxRadius)
         {
             data.currentRadius = 0;
             idle = true;
-            return;
+            return false;
         }
         else
         {
             data.currentRadius += data.scanningSpeed;
+            return scanStarted;
         }
     }
 

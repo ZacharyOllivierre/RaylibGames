@@ -16,6 +16,7 @@
 #include "radar.h"
 #include "upgradeTypes.h"
 #include "upgradeManager.h"
+#include "../audioManager.h"
 
 // TODO
 
@@ -24,7 +25,7 @@ class Game : public Updateable
 public:
     Game(RenderManager *renderManager, UpdateManager *updateManager,
          CollisionManager *collisionManager, World *world,
-         TextureManager *textureManager);
+         TextureManager *textureManager, AudioManager *audioManager);
 
     ~Game();
 
@@ -47,6 +48,7 @@ private:
 
 private:
     World *world;
+    AudioManager *audioManager;
     ProjectileManager projectileManager;
     ShipManager shipManager;
     WaveSpawner waveSpawner;

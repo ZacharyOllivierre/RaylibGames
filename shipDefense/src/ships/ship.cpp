@@ -8,6 +8,7 @@
 #include <cmath>
 
 Ship::Ship(ShipData data, World &world, const ShipVisuals &visuals,
+           AudioManager &audioManager,
            ProjectileSpawner projectileSpawner)
     : PhysicsBody({data.startingPosition.x,
                    data.startingPosition.y,
@@ -17,6 +18,7 @@ Ship::Ship(ShipData data, World &world, const ShipVisuals &visuals,
       data(data),
       world(world),
       visuals(visuals),
+      audioManager(audioManager),
       projectileSpawner(std::move(projectileSpawner))
 {
     if (this->data.maxHealth <= 0.0f)
@@ -105,7 +107,11 @@ void Ship::takeDamage(const DamageEvent &damage)
 
     data.health = std::max(0.0f, data.health - damage.amount);
     if (isDead())
+    {
         destructionTime = 0.0f;
+        if (!isPlayerShip())
+            audioManager.playEffect(AudioManager::Effect::EnemyExplosion);
+    }
 }
 
 void Ship::onCollision(Collidable &other,

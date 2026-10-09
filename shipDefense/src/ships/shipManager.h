@@ -10,6 +10,7 @@
 #include "../renderManager.h"
 #include "../textureManager.h"
 #include "../updateManager.h"
+#include "../audioManager.h"
 
 class ShipManager
 {
@@ -24,6 +25,7 @@ public:
     ShipManager(RenderManager &renderManager, UpdateManager &updateManager,
                 CollisionManager &collisionManager, World &world,
                 TextureManager &textureManager,
+                AudioManager &audioManager,
                 ProjectileSpawner projectileSpawner);
     ~ShipManager();
 
@@ -45,6 +47,7 @@ private:
     CollisionManager &collisionManager;
     World &world;
     TextureManager &textureManager;
+    AudioManager &audioManager;
     ProjectileSpawner projectileSpawner;
 
     std::unique_ptr<PlayerShip> playerShip;

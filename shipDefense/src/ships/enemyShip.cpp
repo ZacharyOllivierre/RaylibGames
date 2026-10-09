@@ -3,8 +3,9 @@
 EnemyShip::EnemyShip(const ShipData &data, World &world, FollowType type,
                      PlayerShip &playerShip,
                      const ShipVisuals &visuals,
+                     AudioManager &audioManager,
                      ProjectileSpawner projectileSpawner)
-    : Ship(data, world, visuals, std::move(projectileSpawner)),
+    : Ship(data, world, visuals, audioManager, std::move(projectileSpawner)),
       followType(type), playerShip(playerShip)
 {
 }

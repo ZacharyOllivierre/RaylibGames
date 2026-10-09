@@ -4,6 +4,7 @@
 #include "collisionManager.h"
 #include "renderManager.h"
 #include "textureManager.h"
+#include "audioManager.h"
 
 #include "graphics/graphics.h"
 #include "game/world.h"
@@ -33,12 +34,13 @@ int main()
     CollisionManager collisionManager;
     RenderManager renderManager;
     TextureManager textureManager;
+    AudioManager audioManager;
 
     // TODO world should be apart of game
     World world(WORLD_SIZE);
 
     Game game(&renderManager, &updateManager, &collisionManager, &world,
-              &textureManager);
+              &textureManager, &audioManager);
     updateManager.add(&game);
 
     Graphics graphics(WINDOW_SIZE, WORLD_SIZE,
@@ -47,6 +49,7 @@ int main()
     while (!WindowShouldClose())
     {
         float delta = GetFrameTime();
+        audioManager.update();
 
         graphics.update(scene, delta);
 
@@ -56,6 +59,7 @@ int main()
         {
             if (IsKeyPressed(KEY_ENTER))
             {
+                audioManager.playEffect(AudioManager::Effect::Blip);
                 game.resetGame();
                 scene = Scene::Game;
                 graphics.resetMainMenu();
@@ -77,6 +81,7 @@ int main()
             if (IsKeyPressed(KEY_ENTER))
             {
                 // duplicate
+                audioManager.playEffect(AudioManager::Effect::Blip);
                 game.resetGame();
                 scene = Scene::MainMenu;
             }

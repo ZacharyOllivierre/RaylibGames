@@ -15,6 +15,7 @@ class EnemyShip : public Ship
 public:
     EnemyShip(const ShipData &data, World &world, FollowType type,
               PlayerShip &playerShip, const ShipVisuals &visuals,
+              AudioManager &audioManager,
               ProjectileSpawner projectileSpawner);
 
     void update(float delta) override;

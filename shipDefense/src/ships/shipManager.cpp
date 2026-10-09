@@ -6,12 +6,14 @@
 ShipManager::ShipManager(RenderManager &renderManager, UpdateManager &updateManager,
                          CollisionManager &collisionManager, World &world,
                          TextureManager &textureManager,
+                         AudioManager &audioManager,
                          ProjectileSpawner projectileSpawner)
     : renderManager(renderManager),
       updateManager(updateManager),
       collisionManager(collisionManager),
       world(world),
       textureManager(textureManager),
+      audioManager(audioManager),
       projectileSpawner(std::move(projectileSpawner))
 {
 }
@@ -30,7 +32,7 @@ Ship &ShipManager::createShip(ShipType type, const ShipData &data)
 
         playerShip = std::make_unique<PlayerShip>(
             data, world, textureManager.playerVisuals,
-            textureManager.pelletAtlas, projectileSpawner);
+            textureManager.pelletAtlas, audioManager, projectileSpawner);
         registerShip(*playerShip);
         return *playerShip;
     }
@@ -43,14 +45,14 @@ Ship &ShipManager::createShip(ShipType type, const ShipData &data)
     {
         enemy = std::make_unique<BomberShip>(
             data, world, *playerShip, textureManager.bomberVisuals,
-            projectileSpawner);
+            audioManager, projectileSpawner);
     }
     else if (type == ShipType::Gunner)
     {
         enemy = std::make_unique<GunnerShip>(
             data, world, *playerShip, textureManager.fighterVisuals,
             textureManager.torpedoAtlas,
-            projectileSpawner);
+            audioManager, projectileSpawner);
     }
     else
     {

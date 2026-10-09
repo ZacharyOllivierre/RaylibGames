@@ -6,9 +6,10 @@ class BomberShip : public EnemyShip
 {
 public:
     BomberShip(const ShipData &data, World &world, PlayerShip &playerShip,
-               const ShipVisuals &visuals, ProjectileSpawner projectileSpawner)
+               const ShipVisuals &visuals, AudioManager &audioManager,
+               ProjectileSpawner projectileSpawner)
         : EnemyShip(data, world, FollowType::TouchRandom, playerShip, visuals,
-                    std::move(projectileSpawner))
+                    audioManager, std::move(projectileSpawner))
     {
     }
 };
