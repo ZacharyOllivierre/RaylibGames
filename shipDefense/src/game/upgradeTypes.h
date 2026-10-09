@@ -8,6 +8,7 @@ enum class UpgradeTypes
     ContactDamage,
     MaxHealth,
     ProjectileDamage,
+    ProjectileCooldown,
     Num,
 };
 

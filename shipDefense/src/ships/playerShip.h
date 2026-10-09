@@ -26,5 +26,9 @@ private:
     void fireProjectile();
 
     Atlas &projectileAtlas;
-    float projectileDamage = 30.0f;
+
+    float projectileDamage;
+
+    float projectileCooldown;
+    float projectileCounter;
 };

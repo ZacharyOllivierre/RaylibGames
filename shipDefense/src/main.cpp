@@ -14,9 +14,11 @@
 const Vector2 WORLD_SIZE = {3000, 1500};
 Vector2 WINDOW_SIZE = {1500, 900};
 
+// TODO replace custom timers in multiple
+// places with one implementation
+
 int main()
 {
-
     InitWindow(WINDOW_SIZE.x, WINDOW_SIZE.y, "Ships And Stuff");
     ToggleFullscreen();
 
@@ -52,7 +54,7 @@ int main()
         {
         case Scene::MainMenu:
         {
-            if (IsKeyPressed(KEY_SPACE))
+            if (IsKeyPressed(KEY_ENTER))
             {
                 game.resetGame();
                 scene = Scene::Game;
@@ -72,7 +74,7 @@ int main()
         }
         case Scene::GameOver:
         {
-            if (IsKeyPressed(KEY_SPACE))
+            if (IsKeyPressed(KEY_ENTER))
             {
                 // duplicate
                 game.resetGame();

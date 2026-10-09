@@ -9,7 +9,7 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
       projectileManager(*renderManager, *updateManager, *collisionManager),
       shipManager(*renderManager, *updateManager, *collisionManager, *world,
                   *textureManager, projectileManager.getSpawner()),
-      waveSpawner(1.1f, 10, shipManager, *world),
+      waveSpawner(1.1f, 25, shipManager, *world),
       result(GameResult::InProgress),
       radar({700, 7, 1, 0, 0, {}}),
       upgradeManager(3),
@@ -32,7 +32,9 @@ void Game::update(float delta)
     if (upgradeWindowActive)
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-            chooseUpgrade(GetMousePosition(), {(float)GetScreenWidth(), (float)GetScreenHeight()});
+            chooseUpgrade(GetMousePosition(),
+                          {(float)GetScreenWidth(), (float)GetScreenHeight()});
+
         return;
     }
 
@@ -51,7 +53,8 @@ void Game::update(float delta)
     {
         if (waveSpawner.hasNextWave())
         {
-            upgrade();
+            upgradeManager.generateChoices();
+            upgradeWindowActive = true;
         }
         else
         {
@@ -137,12 +140,6 @@ void Game::fillRadar(float delta)
             radar.addActiveShip(enemyPos);
         }
     }
-}
-
-void Game::upgrade()
-{
-    upgradeManager.generateChoices();
-    upgradeWindowActive = true;
 }
 
 void Game::chooseUpgrade(Vector2 mousePosition, Vector2 viewportSize)

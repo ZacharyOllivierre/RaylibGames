@@ -34,7 +34,7 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
         {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
         {renderDimensions.x / 2.0f, renderDimensions.y / 2.0f},
         0.0f,
-        0.8f};
+        0.9f};
 
     // fonts
     gameFont = LoadFontEx(
@@ -263,7 +263,7 @@ void Graphics::buildMainMenu()
     // flashing "continue", 6 is timer max
     if (mainMenuSubTimer <= 4)
     {
-        char subText[] = "press space to continue";
+        char subText[] = "press enter to continue";
         int subFontSize = 180;
         int spacing = 1;
 
@@ -321,7 +321,7 @@ void Graphics::buildGameOver(GameResult result)
         WHITE,
         {5, 5});
 
-    const char *subText = "press space to restart";
+    const char *subText = "press enter to restart";
     const int subFontSize = 120;
     const float subSpacing = 1.0f;
 
@@ -343,15 +343,17 @@ void Graphics::buildGameOver(GameResult result)
     EndTextureMode();
 }
 
+// TODO upgrade health bar
 void Graphics::drawHud(const GameView &view)
 {
-    const int fontSize = hudTexture.texture.height / 9;
-    const int barWidth = hudTexture.texture.width / 8;
-    const int barHeight = hudTexture.texture.height / 12;
+    const int fontSize = hudTexture.texture.height / 7;
+    const int barWidth = hudTexture.texture.width / 6;
+    const int barHeight = hudTexture.texture.height / 15;
     const float healthRatio = view.playerMaxHealth > 0.0f
                                   ? view.playerHealth / view.playerMaxHealth
                                   : 0.0f;
 
+    // TODO hardcoded
     int healthEdgeBuffer = 30;
     int hudUiY = 20;
     int healthBarStartX = hudTexture.texture.width - barWidth - healthEdgeBuffer;

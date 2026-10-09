@@ -84,7 +84,7 @@ public:
             atlas.getFrame(animationTime, framesPerSecond));
 
         // TODO debug hitbox draw
-        DrawRectangleLinesEx(PhysicsBody::getBody(), 2, RED);
+        // DrawRectangleLinesEx(PhysicsBody::getBody(), 2, RED);
     }
 
     bool isExpired() const

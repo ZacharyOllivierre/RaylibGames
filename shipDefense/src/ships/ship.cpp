@@ -64,6 +64,29 @@ float Ship::getMaxHealth() const
     return data.maxHealth;
 }
 
+void Ship::applyUpgrade(UpgradeTypes type)
+{
+    switch (type)
+    {
+    case UpgradeTypes::Speed:
+        data.speed += 75.0f;
+        break;
+    case UpgradeTypes::ContactDamage:
+        data.contactDamage += 1.0f;
+        break;
+    case UpgradeTypes::MaxHealth:
+        data.maxHealth += 25.0f;
+        data.health += 25.0f;
+        break;
+
+    // for compiler warning
+    case UpgradeTypes::ProjectileDamage:
+    case UpgradeTypes::ProjectileCooldown:
+    case UpgradeTypes::Num:
+        break;
+    }
+}
+
 bool Ship::isDead() const
 {
     return data.health <= 0.0f;
@@ -141,5 +164,5 @@ void Ship::render()
     }
 
     // TODO debug hitbox draw
-    DrawRectangleLinesEx(body, 2.0f, RED);
+    // DrawRectangleLinesEx(body, 2.0f, RED);
 }

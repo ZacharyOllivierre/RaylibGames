@@ -8,6 +8,8 @@
 
 #include "upgradeTypes.h"
 
+// TODO split into .h .cpp
+
 class UpgradeManager
 {
 public:
@@ -16,6 +18,7 @@ public:
     {
     }
 
+    // TODO gross
     void generateChoices()
     {
         upgradeChoices.clear();
@@ -24,11 +27,15 @@ public:
             UpgradeTypes::Speed,
             UpgradeTypes::ContactDamage,
             UpgradeTypes::MaxHealth,
-            UpgradeTypes::ProjectileDamage};
+            UpgradeTypes::ProjectileDamage,
+            UpgradeTypes::ProjectileCooldown};
+
         std::shuffle(allUpgrades.begin(), allUpgrades.end(),
                      std::mt19937{static_cast<unsigned int>(GetRandomValue(0, 1000000))});
-        upgradeChoices.assign(allUpgrades.begin(),
-                              allUpgrades.begin() + std::min<int>(choiceCount, allUpgrades.size()));
+
+        upgradeChoices.assign(
+            allUpgrades.begin(),
+            allUpgrades.begin() + std::min<int>(choiceCount, allUpgrades.size()));
     }
 
     const std::vector<UpgradeTypes> &getUpgradeTypes() const
@@ -65,6 +72,12 @@ public:
                 data.name = "Damage";
                 data.description = "Increases Projectile Damage";
                 break;
+
+            case UpgradeTypes::ProjectileCooldown:
+                data.name = "Cooldown";
+                data.description = "Guns Go More BURRR";
+                break;
+
             case UpgradeTypes::Num:
                 break;
             }

@@ -6,11 +6,14 @@
 
 #include <cmath>
 
+// TODO starting projectile damage set here and not "init-able"
 PlayerShip::PlayerShip(const ShipData &data, World &world,
                        const ShipVisuals &visuals, Atlas &projectileAtlas,
                        ProjectileSpawner projectileSpawner)
     : Ship(data, world, visuals, std::move(projectileSpawner)),
-      projectileAtlas(projectileAtlas)
+      projectileAtlas(projectileAtlas),
+      projectileDamage(25),
+      projectileCooldown(0.8f)
 {
 }
 
@@ -22,6 +25,12 @@ void PlayerShip::applyUpgrade(UpgradeTypes type)
         return;
     }
 
+    else if (type == UpgradeTypes::ProjectileCooldown)
+    {
+        if (projectileCooldown > 0.1f)
+            projectileCooldown -= 0.1f;
+    }
+
     Ship::applyUpgrade(type);
 }
 
@@ -29,11 +38,20 @@ void PlayerShip::update(float delta)
 {
     shipInputControls();
 
+    if (projectileCooldown >= 0)
+    {
+        projectileCounter -= delta;
+    }
+
     Ship::update(delta);
 }
 
 void PlayerShip::fireProjectile()
 {
+    if (projectileCounter > 0)
+        return;
+    projectileCounter = projectileCooldown;
+
     Rectangle body = getCollisionBounds();
     Vector2 center = {
         body.x + body.width / 2.0f,
@@ -61,6 +79,6 @@ void PlayerShip::shipInputControls()
     if (IsKeyDown(KEY_D))
         addForce({data.speed, 0});
 
-    if (IsKeyPressed(KEY_SPACE))
+    if (IsKeyDown(KEY_SPACE))
         fireProjectile();
 }

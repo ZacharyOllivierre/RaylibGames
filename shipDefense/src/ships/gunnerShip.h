@@ -12,7 +12,7 @@ public:
                const ShipVisuals &visuals, Atlas &projectileAtlas, ProjectileSpawner projectileSpawner)
         : EnemyShip(data, world, FollowType::Approach, playerShip, visuals,
                     std::move(projectileSpawner)),
-          shotInterval(1.0f),
+          shotInterval(1.5f),
           timer(shotInterval),
           projectileAtlas(projectileAtlas)
     {

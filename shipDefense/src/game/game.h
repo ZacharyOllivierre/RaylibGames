@@ -45,9 +45,6 @@ private:
 
     void fillRadar(float delta);
 
-    // TODO naming
-    void upgrade();
-
 private:
     World *world;
     ProjectileManager projectileManager;

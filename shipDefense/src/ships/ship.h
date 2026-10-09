@@ -56,25 +56,7 @@ public:
     float getHealth() const;
     float getMaxHealth() const;
 
-    virtual void applyUpgrade(UpgradeTypes type)
-    {
-        switch (type)
-        {
-        case UpgradeTypes::Speed:
-            data.speed += 75.0f;
-            break;
-        case UpgradeTypes::ContactDamage:
-            data.contactDamage += 1.0f;
-            break;
-        case UpgradeTypes::MaxHealth:
-            data.maxHealth += 25.0f;
-            data.health += 25.0f;
-            break;
-        case UpgradeTypes::ProjectileDamage:
-        case UpgradeTypes::Num:
-            break;
-        }
-    }
+    virtual void applyUpgrade(UpgradeTypes type);
 
     bool isDead() const;
 
