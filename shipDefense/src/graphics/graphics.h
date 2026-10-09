@@ -41,8 +41,10 @@ private:
     void buildGameOver(GameResult result);
 
     void drawHud(const GameView &view);
-    void drawMap(const GameView &view);
+    void drawMap(const GameView &view, float edgeBuffer = 0);
     void buildHud(const GameView &view);
+
+    void drawUpgrade(const GameView &view);
 
     void drawGrid(Rectangle &area, int spacing, Color color);
     void drawCornerRectangle(const Rectangle &area, float edgePercentage,
@@ -71,6 +73,7 @@ private:
     TextureManager *textureManager;
 
     Font gameFont;
+    Font secondaryFont;
 
     Shader bloom;
 

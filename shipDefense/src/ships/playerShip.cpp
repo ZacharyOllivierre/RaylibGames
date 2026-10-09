@@ -14,6 +14,17 @@ PlayerShip::PlayerShip(const ShipData &data, World &world,
 {
 }
 
+void PlayerShip::applyUpgrade(UpgradeTypes type)
+{
+    if (type == UpgradeTypes::ProjectileDamage)
+    {
+        projectileDamage += 10.0f;
+        return;
+    }
+
+    Ship::applyUpgrade(type);
+}
+
 void PlayerShip::update(float delta)
 {
     shipInputControls();
@@ -36,7 +47,7 @@ void PlayerShip::fireProjectile()
     Vector2 velocity = Vector2Scale(direction, 800.0f);
 
     spawnProjectile(std::make_unique<Pellet>(
-        position, velocity, *this, projectileAtlas));
+        position, velocity, *this, projectileAtlas, projectileDamage));
 }
 
 void PlayerShip::shipInputControls()

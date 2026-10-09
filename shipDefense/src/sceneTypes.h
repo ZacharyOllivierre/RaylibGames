@@ -7,12 +7,12 @@ enum class Scene
 {
     MainMenu,
     Game,
-    GameOver,
+    GameOver
 };
 
 enum class GameResult
 {
     InProgress,
     Win,
-    Lose,
+    Lose
 };

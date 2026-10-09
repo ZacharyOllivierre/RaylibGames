@@ -3,12 +3,20 @@
 #include "raymath.h"
 #include <algorithm>
 
+#include "../game/upgradeTypes.h"
+#include "../game/upgradeLayout.h"
+
+// TODO most of the draw functions recalculate the same information
+// every call store instead
+
+// TODO make color wheel for color standardization
+
 Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
                    RenderManager *rManager, TextureManager *textureManager, Game *game)
     : game(game),
       windowDimensions(windowDimensions),
       worldDimensions(worldDimensions),
-      renderDimensions({854, 480}),
+      renderDimensions({960, 540}),
       renderManager(rManager),
       textureManager(textureManager),
       bloom(LoadShader(nullptr, "src/shader/bloom.fs")),
@@ -19,7 +27,7 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
     gameTexture = LoadRenderTexture(renderDimensions.x, renderDimensions.y);
     mainMenuTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
     gameOverTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
-    hudTexture = LoadRenderTexture(windowDimensions.x, windowDimensions.y);
+    hudTexture = LoadRenderTexture(renderDimensions.x, renderDimensions.y);
 
     // init camera
     camera = {
@@ -28,10 +36,15 @@ Graphics::Graphics(Vector2 windowDimensions, Vector2 worldDimensions,
         0.0f,
         0.8f};
 
-    // font
+    // fonts
     gameFont = LoadFontEx(
         "assets/fonts/Doom2016.ttf",
         450,
+        nullptr,
+        0);
+    secondaryFont = LoadFontEx(
+        "assets/fonts/secondary.ttf",
+        200,
         nullptr,
         0);
 
@@ -47,6 +60,7 @@ Graphics::~Graphics()
     UnloadRenderTexture(hudTexture);
 
     UnloadFont(gameFont);
+    UnloadFont(secondaryFont);
 
     UnloadShader(bloom);
 }
@@ -155,10 +169,12 @@ void Graphics::drawGame(const GameView &view)
 
     EndShaderMode();
 
-    DrawTextureRec(hudTexture.texture,
-                   {0, 0, windowDimensions.x, -windowDimensions.y},
-                   {0, 0},
-                   WHITE);
+    DrawTexturePro(
+        hudTexture.texture,
+        {0, 0,
+         (float)hudTexture.texture.width, -(float)hudTexture.texture.height},
+        {0, 0, windowDimensions.x, windowDimensions.y},
+        {0, 0}, 0.0f, WHITE);
 
     // DrawFPS(10, 10);
     EndDrawing();
@@ -329,16 +345,16 @@ void Graphics::buildGameOver(GameResult result)
 
 void Graphics::drawHud(const GameView &view)
 {
-    const int fontSize = 180;
-    const int barWidth = 400;
-    const int barHeight = 30;
+    const int fontSize = hudTexture.texture.height / 9;
+    const int barWidth = hudTexture.texture.width / 8;
+    const int barHeight = hudTexture.texture.height / 12;
     const float healthRatio = view.playerMaxHealth > 0.0f
                                   ? view.playerHealth / view.playerMaxHealth
                                   : 0.0f;
 
     int healthEdgeBuffer = 30;
     int hudUiY = 20;
-    int healthBarStartX = windowDimensions.x - barWidth - healthEdgeBuffer;
+    int healthBarStartX = hudTexture.texture.width - barWidth - healthEdgeBuffer;
 
     // round
     DrawDoubleText(
@@ -363,20 +379,37 @@ void Graphics::drawHud(const GameView &view)
     DrawRectangleLines(healthBarStartX, hudUiY, barWidth, barHeight, WHITE);
 
     drawMap(view);
+
+    if (view.upgradeWindowActive)
+        drawUpgrade(view);
 }
 
-void Graphics::drawMap(const GameView &view)
+void Graphics::drawMap(const GameView &view, float edgeBuffer)
 {
+    // TODO starter info like map size etc only need to be calculated once
+    Vector2 textureDimensions = {(float)hudTexture.texture.width,
+                                 (float)hudTexture.texture.height};
+
+    // map and world dimensions need to match 2 to 1 ratio
+    float smallerDimension = std::min(textureDimensions.x, textureDimensions.y);
+    Vector2 mapDimensions;
+    mapDimensions.x = smallerDimension / 3;
+    mapDimensions.y = mapDimensions.x / 2;
+
     Rectangle map = {
-        windowDimensions.x - 400,
-        windowDimensions.y - 200,
-        400.0f,
-        200.0f};
+        textureDimensions.x - mapDimensions.x - edgeBuffer,
+        textureDimensions.y - mapDimensions.y - edgeBuffer,
+        mapDimensions.x,
+        mapDimensions.y};
 
     Color gridColor = Color{100, 220, 150, 190};
+    Color backgroundColor = Color{0, 0, 0, 150};
+    // TODO replace with better colors
+    Color radarGreen = GREEN;
+    Color enemyColor = RED;
 
     // draw background and grid
-    DrawRectangleRec(map, Color{0, 0, 0, 150});
+    DrawRectangleRec(map, backgroundColor);
     drawGrid(map, map.height / 5, gridColor);
 
     const Vector2 playerPosition = translateToMap(view.cameraTarget, map);
@@ -388,25 +421,26 @@ void Graphics::drawMap(const GameView &view)
 
     DrawCircleV(playerPosition,
                 radar.currentRadius * mapScale,
-                Fade(GREEN, 0.4f));
+                Fade(radarGreen, 0.4f));
     DrawCircleLinesV(playerPosition,
                      radar.currentRadius * mapScale,
-                     Fade(GREEN, 0.9f));
+                     Fade(radarGreen, 0.9f));
+
+    const float entitySize = std::min(map.width, map.height) / 6.0f;
 
     for (const Vector2 enemyPosition : radar.activeShipPositions)
     {
         const Vector2 mapPosition = translateToMap(enemyPosition, map);
-        DrawCircleV(mapPosition, 3.0f, RED);
-        drawCornerRectangle({mapPosition.x - 8.0f, mapPosition.y - 8.0f,
-                             16.0f, 16.0f},
-                            0.35f, Fade(RED, 0.85f), 1.5f);
+        DrawCircleV(mapPosition, entitySize / 8.0f, enemyColor);
+        drawCornerRectangle({mapPosition.x - entitySize / 2.0f, mapPosition.y - entitySize / 2.0f,
+                             entitySize, entitySize},
+                            0.35f, Fade(enemyColor, 0.85f), 1.0f);
     }
 
-    const float playerSize = std::min(map.width, map.height) / 5.0f;
     drawCornerRectangle(
-        {playerPosition.x - playerSize / 2.0f,
-         playerPosition.y - playerSize / 2.0f,
-         playerSize, playerSize},
+        {playerPosition.x - entitySize / 2.0f,
+         playerPosition.y - entitySize / 2.0f,
+         entitySize, entitySize},
         0.35f, gridColor);
 
     EndScissorMode();
@@ -420,6 +454,67 @@ void Graphics::buildHud(const GameView &view)
     ClearBackground(BLANK);
     drawHud(view);
     EndTextureMode();
+}
+
+void Graphics::drawUpgrade(const GameView &)
+{
+    std::vector<UpgradeData> upgradeList = game->getUpgradeList();
+    const int numUpgrades = static_cast<int>(upgradeList.size());
+
+    if (numUpgrades == 0)
+        return;
+
+    const Vector2 canvasSize = {
+        static_cast<float>(hudTexture.texture.width),
+        static_cast<float>(hudTexture.texture.height)};
+
+    const Color overlayColor = Color{5, 8, 18, 255};
+    const Color titleColor = WHITE;
+    const Color panelAccentColor = RED;
+    const Color panelBackgroundColor = Color{25, 34, 48, 255};
+    const Color panelBorderColor = Color{130, 160, 170, 255};
+    const Color descriptionColor = WHITE;
+
+    // background overlay
+    DrawRectangle(0, 0, hudTexture.texture.width, hudTexture.texture.height,
+                  Fade(overlayColor, 0.92f));
+
+    // title
+    const char *title = "CHOOSE AN UPGRADE";
+    const int titleSize = hudTexture.texture.height / 8;
+    const Vector2 titleDimensions = MeasureTextEx(secondaryFont, title, titleSize, 2.0f);
+    DrawTextEx(secondaryFont, title,
+               {(canvasSize.x - titleDimensions.x) / 2.0f, canvasSize.y * 0.08f},
+               titleSize, 2.0f, titleColor);
+
+    // upgrades
+    for (int i = 0; i < numUpgrades; i++)
+    {
+        const Rectangle panel = UpgradeLayout::panel(canvasSize, i, numUpgrades);
+
+        // panel
+        DrawRectangleRec(panel, panelBackgroundColor);
+        DrawRectangleLinesEx(panel, 1.0f, Fade(panelBorderColor, 0.65f));
+        drawCornerRectangle(panel, 0.22f, panelAccentColor, 3.0f);
+
+        // TODO not dynamically fitting text size, too long will go out of panel
+        const UpgradeData &upgrade = upgradeList[i];
+        int nameSize = hudTexture.texture.height / 8;
+        int titleWidth = MeasureTextEx(secondaryFont, upgrade.name.c_str(), nameSize, 2.0f).x;
+
+        DrawTextEx(secondaryFont, upgrade.name.c_str(),
+                   {panel.x + (panel.width - titleWidth) / 2.0f,
+                    panel.y + panel.height * 0.16f},
+                   nameSize, 2.0f, panelAccentColor);
+
+        const int descriptionSize = hudTexture.texture.height / 22;
+        const int width = MeasureTextEx(secondaryFont, upgrade.description.c_str(), descriptionSize, 2.0f).x;
+
+        DrawTextEx(secondaryFont, upgrade.description.c_str(),
+                   {panel.x + panel.width / 2 - width / 2,
+                    panel.y + panel.height * 0.5f},
+                   descriptionSize, 2.0f, descriptionColor);
+    }
 }
 
 void Graphics::drawGrid(Rectangle &area, int spacing, Color color)

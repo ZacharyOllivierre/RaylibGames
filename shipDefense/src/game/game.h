@@ -14,6 +14,8 @@
 #include "waveSpawner.h"
 #include "gameView.h"
 #include "radar.h"
+#include "upgradeTypes.h"
+#include "upgradeManager.h"
 
 // TODO
 
@@ -34,11 +36,17 @@ public:
     GameView getView() const;
 
     const RadarData &getRadarData() { return radar.getData(); }
+    std::vector<UpgradeData> getUpgradeList() const { return upgradeManager.getUpgradeData(); }
 
 private:
     void initPlayerShip();
 
+    void chooseUpgrade(Vector2 mousePosition, Vector2 viewportSize);
+
     void fillRadar(float delta);
+
+    // TODO naming
+    void upgrade();
 
 private:
     World *world;
@@ -47,4 +55,7 @@ private:
     WaveSpawner waveSpawner;
     GameResult result;
     Radar radar;
+
+    UpgradeManager upgradeManager;
+    bool upgradeWindowActive;
 };

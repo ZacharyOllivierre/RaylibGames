@@ -25,6 +25,8 @@ int main()
 
     SetTargetFPS(60);
 
+    Scene scene = Scene::MainMenu;
+
     UpdateManager updateManager;
     CollisionManager collisionManager;
     RenderManager renderManager;
@@ -39,8 +41,6 @@ int main()
 
     Graphics graphics(WINDOW_SIZE, WORLD_SIZE,
                       &renderManager, &textureManager, &game);
-
-    Scene scene = Scene::MainMenu;
 
     while (!WindowShouldClose())
     {
@@ -84,6 +84,5 @@ int main()
     }
 
     CloseWindow();
-
     return 0;
 }

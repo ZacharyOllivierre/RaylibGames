@@ -19,9 +19,12 @@ public:
         return true;
     }
 
+    void applyUpgrade(UpgradeTypes type) override;
+
 private:
     void shipInputControls();
     void fireProjectile();
 
     Atlas &projectileAtlas;
+    float projectileDamage = 30.0f;
 };

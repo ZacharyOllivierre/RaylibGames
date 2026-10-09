@@ -1,6 +1,8 @@
 #pragma once
 
 #include "raylib.h"
+#include <vector>
+#include <string>
 
 #include "../sceneTypes.h"
 
@@ -12,4 +14,6 @@ struct GameView
     float playerMaxHealth;
     Vector2 cameraTarget;
     GameResult result;
+
+    bool upgradeWindowActive;
 };

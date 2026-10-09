@@ -1,5 +1,7 @@
 #include "game.h"
 
+#include "upgradeLayout.h"
+
 Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
            CollisionManager *collisionManager, World *world,
            TextureManager *textureManager)
@@ -9,7 +11,9 @@ Game::Game(RenderManager *renderManager, UpdateManager *updateManager,
                   *textureManager, projectileManager.getSpawner()),
       waveSpawner(1.1f, 10, shipManager, *world),
       result(GameResult::InProgress),
-      radar({700, 7, 1, 0, 0, {}})
+      radar({700, 7, 1, 0, 0, {}}),
+      upgradeManager(3),
+      upgradeWindowActive(false)
 {
     initPlayerShip();
     startRound();
@@ -24,6 +28,13 @@ void Game::update(float delta)
 {
     if (result != GameResult::InProgress)
         return;
+
+    if (upgradeWindowActive)
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            chooseUpgrade(GetMousePosition(), {(float)GetScreenWidth(), (float)GetScreenHeight()});
+        return;
+    }
 
     shipManager.cleanupDestroyedShips();
     projectileManager.cleanup();
@@ -40,7 +51,7 @@ void Game::update(float delta)
     {
         if (waveSpawner.hasNextWave())
         {
-            startRound();
+            upgrade();
         }
         else
         {
@@ -60,6 +71,7 @@ void Game::resetGame()
     shipManager.clear();
     waveSpawner.reset();
     result = GameResult::InProgress;
+    upgradeWindowActive = false;
     initPlayerShip();
     startRound();
 }
@@ -80,7 +92,8 @@ GameView Game::getView() const
         player->getMaxHealth(),
         {playerBody.x + playerBody.width / 2.0f,
          playerBody.y + playerBody.height / 2.0f},
-        result};
+        result,
+        upgradeWindowActive};
 }
 
 void Game::initPlayerShip()
@@ -122,6 +135,35 @@ void Game::fillRadar(float delta)
         if (distance <= radius)
         {
             radar.addActiveShip(enemyPos);
+        }
+    }
+}
+
+void Game::upgrade()
+{
+    upgradeManager.generateChoices();
+    upgradeWindowActive = true;
+}
+
+void Game::chooseUpgrade(Vector2 mousePosition, Vector2 viewportSize)
+{
+    if (viewportSize.x <= 0.0f || viewportSize.y <= 0.0f)
+        return;
+
+    const Vector2 normalizedMouse = {
+        mousePosition.x / viewportSize.x,
+        mousePosition.y / viewportSize.y};
+    const int choiceCount = static_cast<int>(upgradeManager.getUpgradeTypes().size());
+
+    for (int index = 0; index < choiceCount; ++index)
+    {
+        const Rectangle panel = UpgradeLayout::panel({1.0f, 1.0f}, index, choiceCount);
+        if (CheckCollisionPointRec(normalizedMouse, panel))
+        {
+            shipManager.getPlayerShip()->applyUpgrade(upgradeManager.getUpgradeTypes()[index]);
+            upgradeWindowActive = false;
+            startRound();
+            return;
         }
     }
 }
