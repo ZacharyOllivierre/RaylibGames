@@ -313,6 +313,16 @@ void Stock::toggleFlag(const std::string &key)
     flags.push_back({key, currentGraphPrice()});
 }
 
+const std::string &Stock::symbol() const
+{
+    return config.symbol;
+}
+
+float Stock::price() const
+{
+    return currentPrice;
+}
+
 float Stock::changePercent() const
 {
     return (currentPrice - openingPrice) / openingPrice * 100.0f;

@@ -2,6 +2,8 @@ SOURCES = \
 	src/main.cpp \
 	src/graphics/graphics.cpp \
 	src/game/stock.cpp \
+	src/game/player.cpp \
+	src/game/roulette.cpp \
 	src/game/game.cpp \
 
 OBJECTS = $(SOURCES:.cpp=.o)

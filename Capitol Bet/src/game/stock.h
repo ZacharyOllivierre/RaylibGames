@@ -44,6 +44,8 @@ public:
 
     void toggleFlag(const std::string &key);
 
+    const std::string &symbol() const;
+    float price() const;
     float changePercent() const;
 
 private:

@@ -3,5 +3,9 @@
 enum class AppState
 {
     MainMenu,
-    Game
+    Game,
+    Help,
+    Bribe,
+    GameOverBad,
+    GameOverWin
 };

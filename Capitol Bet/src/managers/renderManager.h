@@ -33,6 +33,11 @@ public:
             objects.end());
     }
 
+    void clear()
+    {
+        objects.clear();
+    }
+
 private:
     std::vector<Renderable *> objects;
 };

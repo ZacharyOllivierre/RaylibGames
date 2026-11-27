@@ -7,6 +7,7 @@ int main()
     const Vector2 renderDimensions = {960, 540};
 
     InitWindow(renderDimensions.x, renderDimensions.y, "Capitol Bet");
+    SetExitKey(KEY_NULL);
     ToggleFullscreen();
     SetTargetFPS(60);
 

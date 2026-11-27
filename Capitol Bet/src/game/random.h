@@ -19,6 +19,11 @@ public:
                (probability >= 1.0f || unitDistribution(generator) < probability);
     }
 
+    int integer(int minimum, int maximum)
+    {
+        return std::uniform_int_distribution<int>(minimum, maximum)(generator);
+    }
+
 private:
     std::mt19937 generator;
     std::uniform_real_distribution<float> distribution{-1.0f, 1.0f};

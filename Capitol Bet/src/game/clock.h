@@ -10,14 +10,30 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <cstdint>
 #include <string>
 
 enum class GamePhase
 {
-    PreMarket,
+    Casino,
     Trading,
     AfterHours
 };
+
+inline const char *gamePhaseName(GamePhase phase)
+{
+    switch (phase)
+    {
+    case GamePhase::Casino:
+        return "CASINO";
+    case GamePhase::Trading:
+        return "TRADING";
+    case GamePhase::AfterHours:
+        return "AFTER-HOURS";
+    }
+
+    return "UNKNOWN";
+}
 
 class GameClock : public Renderable, public Updateable
 {
@@ -41,6 +57,29 @@ public:
             timeOfDay += secondsPerDay;
     }
 
+    void reset()
+    {
+        timeOfDay = tradingOpenHour * secondsPerHour;
+        simulationSpeed = 1.0f;
+        elapsedGameHoursSinceStart = 0.0f;
+    }
+
+    bool advanceToNextTime(int hour, int minute)
+    {
+        if (hour < 0 || hour >= 24 || minute < 0 || minute >= 60)
+            return false;
+
+        const float targetTime =
+            static_cast<float>(hour * 60 + minute) * secondsPerMinute;
+        float elapsedSeconds = targetTime - timeOfDay;
+        if (elapsedSeconds <= 0.0f)
+            elapsedSeconds += secondsPerDay;
+
+        timeOfDay = targetTime;
+        elapsedGameHoursSinceStart += elapsedSeconds / secondsPerHour;
+        return true;
+    }
+
     void render() override
     {
         const std::string timeText = formatTime();
@@ -48,13 +87,13 @@ public:
 
         GraphicsUtil::drawGlowText(
             timeText,
-            {30.0f, 478.0f},
+            {30.0f, 384.0f},
             28,
             StockColors::text,
             StockColors::glow);
         GraphicsUtil::drawGlowText(
             phaseText,
-            {30.0f, 510.0f},
+            {30.0f, 416.0f},
             16,
             StockColors::mutedText,
             StockColors::glow);
@@ -80,6 +119,12 @@ public:
         return elapsedGameHoursSinceStart;
     }
 
+    std::uint64_t tradingDayIndex() const
+    {
+        return static_cast<std::uint64_t>(
+            elapsedGameHoursSinceStart / 24.0f);
+    }
+
     float hour() const
     {
         return timeOfDay / secondsPerHour;
@@ -87,10 +132,11 @@ public:
 
     GamePhase phase() const
     {
-        if (hour() < marketOpenHour)
-            return GamePhase::PreMarket;
+        const float currentHour = hour();
+        if (currentHour < tradingOpenHour || currentHour >= casinoOpenHour)
+            return GamePhase::Casino;
 
-        if (hour() < marketCloseHour)
+        if (currentHour < afterHoursOpenHour)
             return GamePhase::Trading;
 
         return GamePhase::AfterHours;
@@ -110,24 +156,15 @@ public:
 private:
     std::string phaseName() const
     {
-        switch (phase())
-        {
-        case GamePhase::PreMarket:
-            return "PRE MARKET";
-        case GamePhase::Trading:
-            return "TRADING";
-        case GamePhase::AfterHours:
-            return "AFTER-HOURS";
-        }
-
-        return "UNKNOWN";
+        return gamePhaseName(phase());
     }
 
     static constexpr float secondsPerMinute = 60.0f;
     static constexpr float secondsPerHour = secondsPerMinute * 60.0f;
     static constexpr float secondsPerDay = secondsPerHour * 24.0f;
-    static constexpr float marketOpenHour = 6.0f;
-    static constexpr float marketCloseHour = 22.0f;
+    static constexpr float tradingOpenHour = 6.0f;
+    static constexpr float afterHoursOpenHour = 18.0f;
+    static constexpr float casinoOpenHour = 22.0f;
     static constexpr float minimumHourLength = 0.01f;
 
     float timeOfDay;

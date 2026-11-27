@@ -32,6 +32,11 @@ public:
             objects.end());
     }
 
+    void clear()
+    {
+        objects.clear();
+    }
+
 private:
     std::vector<Updateable *> objects;
 };
