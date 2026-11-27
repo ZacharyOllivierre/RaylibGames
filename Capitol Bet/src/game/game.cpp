@@ -7,7 +7,6 @@
 #include <cstdlib>
 #include <random>
 #include <sstream>
-#include <algorithm>
 
 namespace
 {
@@ -493,7 +492,13 @@ bool Game::changeSpeed(const std::string &command)
     const float maxSpeed = 20.0;
     const float minSpeed = 1.0;
 
-    speed = std::clamp(speed, minSpeed, maxSpeed);
+    if (speed > maxSpeed)
+        speed = maxSpeed;
+    if (speed < minSpeed)
+        speed = minSpeed;
+
+    // TODO red for some reason
+    // speed = std::clamp(speed, minSpeed, maxSpeed);
 
     clock.setSimulationSpeed(speed);
     return true;
